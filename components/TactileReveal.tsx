@@ -216,28 +216,10 @@ export default function TactileReveal({
                 </motion.div>
 
                 {/* Mobile hint - shows only on first view */}
-                {isMobile && !hasInteracted && (
-                    <motion.div
-                        initial={{ opacity: 0, y: 10 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        exit={{ opacity: 0 }}
-                        className="absolute bottom-3 left-1/2 -translate-x-1/2 px-4 py-2 rounded-full backdrop-blur-md text-xs font-medium text-text-ink bg-white/90 pointer-events-none z-20"
-                    >
-                        Swipe left or right to compare
-                    </motion.div>
-                )}
+
 
                 {/* Desktop hint - shows only on first view */}
-                {!isMobile && !hasInteracted && (
-                    <motion.div
-                        initial={{ opacity: 0, y: 10 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        exit={{ opacity: 0 }}
-                        className="absolute bottom-3 left-1/2 -translate-x-1/2 px-4 py-2 rounded-full backdrop-blur-md text-xs font-medium text-text-ink bg-white/90 pointer-events-none z-20"
-                    >
-                        Drag left or right to compare
-                    </motion.div>
-                )}
+
             </motion.div>
 
             {/* Description */}
