@@ -47,19 +47,19 @@ export default function PainContrast() {
                     </div>
 
                     {/* The Vault - Premium/Good */}
-                    <div className="bg-white p-8 md:p-12 rounded-2xl shadow-xl border border-accent/10 relative overflow-hidden group">
+                    <div className="bg-white p-8 md:p-12 rounded-2xl shadow-xl border border-black/10 relative overflow-hidden group">
                         <div className="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity">
-                            <Zap size={120} className="text-accent" />
+                            <Zap size={120} className="text-black" />
                         </div>
 
-                        <h2 className="text-xl font-medium text-accent mb-8 flex items-center gap-2">
-                            <span className="w-2 h-2 rounded-full bg-accent animate-pulse"></span>
+                        <h2 className="text-xl font-medium text-black mb-8 flex items-center gap-2">
+                            <span className="w-2 h-2 rounded-full bg-black animate-pulse"></span>
                             The Vault
                         </h2>
 
                         <div className="space-y-8 relative z-10">
                             <div className="flex gap-4">
-                                <div className="w-12 h-12 rounded-full bg-accent/10 flex items-center justify-center shrink-0 text-accent">
+                                <div className="w-12 h-12 rounded-full bg-black/10 flex items-center justify-center shrink-0 text-black">
                                     <Box size={20} />
                                 </div>
                                 <div>
@@ -69,7 +69,7 @@ export default function PainContrast() {
                             </div>
 
                             <div className="flex gap-4">
-                                <div className="w-12 h-12 rounded-full bg-accent/10 flex items-center justify-center shrink-0 text-accent">
+                                <div className="w-12 h-12 rounded-full bg-black/10 flex items-center justify-center shrink-0 text-black">
                                     <Zap size={20} />
                                 </div>
                                 <div>
@@ -79,7 +79,7 @@ export default function PainContrast() {
                             </div>
 
                             <div className="flex gap-4">
-                                <div className="w-12 h-12 rounded-full bg-accent/10 flex items-center justify-center shrink-0 text-accent">
+                                <div className="w-12 h-12 rounded-full bg-black/10 flex items-center justify-center shrink-0 text-black">
                                     <Check size={20} />
                                 </div>
                                 <div>

@@ -22,7 +22,7 @@ export default function Hero() {
                     <div className="aspect-[4/5] w-full bg-surface rounded-sm overflow-hidden relative shadow-2xl">
                         <TactileReveal
                             // Before: Generated "Bad" photo of t-shirt on rack
-                            beforeImage="/images/hero-before.png"
+                            beforeImage="/images/hero-before-new.jpg"
                             // After: Generated "Amazing" lifestyle city shot
                             afterImage="/images/hero-after.png"
                             priority={true}
