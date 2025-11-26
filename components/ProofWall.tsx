@@ -3,11 +3,11 @@ import TactileReveal from "./TactileReveal";
 export default function ProofWall() {
     const examples = [
         {
-            title: "Skincare",
-            // Before: Boring white bottle on plain background
-            before: "https://images.unsplash.com/photo-1580870055504-d259905f3293?q=80&w=2940&auto=format&fit=crop",
-            // After: Styled/Lit packaging
-            after: "https://images.unsplash.com/photo-1629198688000-71f23e745b6e?q=80&w=2880&auto=format&fit=crop"
+            title: "Homewares",
+            // Before: Box with candles
+            before: "/images/homewares-before.png",
+            // After: Candle on table
+            after: "/images/homewares-after.png"
         },
         {
             title: "Furniture",
