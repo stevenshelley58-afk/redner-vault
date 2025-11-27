@@ -12,9 +12,9 @@ export default function ProofWall() {
         {
             title: "Furniture",
             // Before: Plain chair in empty room / bad angle
-            before: "https://images.unsplash.com/photo-1592078615290-033ee584e267?q=80&w=3024&auto=format&fit=crop",
+            before: "/images/mirror-before.png",
             // After: Styled Room
-            after: "https://images.unsplash.com/photo-1567016432779-094069958ea5?q=80&w=2787&auto=format&fit=crop"
+            after: "/images/mirror-after.png"
         },
         {
             title: "Toys",
