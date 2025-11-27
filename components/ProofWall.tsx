@@ -19,9 +19,9 @@ export default function ProofWall() {
         {
             title: "Tech",
             // Before: Simple/Boring device photo
-            before: "https://images.unsplash.com/photo-1550029402-226115b7c579?q=80&w=2930&auto=format&fit=crop",
+            before: "/images/elf-before.png",
             // After: Final Product Render
-            after: "https://images.unsplash.com/photo-1496181133206-80ce9b88a853?q=80&w=2942&auto=format&fit=crop"
+            after: "/images/elf-after.png"
         }
     ];
 
