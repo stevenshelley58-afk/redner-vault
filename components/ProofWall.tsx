@@ -17,11 +17,11 @@ export default function ProofWall() {
             after: "https://images.unsplash.com/photo-1567016432779-094069958ea5?q=80&w=2787&auto=format&fit=crop"
         },
         {
-            title: "Tech",
+            title: "Toys",
             // Before: Simple/Boring device photo
-            before: "/images/elf-before.png",
+            before: "/images/toys-before.png",
             // After: Final Product Render
-            after: "/images/elf-after.png"
+            after: "/images/toys-after.png"
         }
     ];
 
