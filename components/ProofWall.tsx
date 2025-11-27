@@ -33,7 +33,7 @@ export default function ProofWall() {
                 <div className="grid grid-cols-4 md:grid-cols-12 gap-8">
                     {examples.map((item) => (
                         <div key={item.title} className="col-span-4 md:col-span-4 space-y-4">
-                            <div className="aspect-square w-full bg-surface rounded-sm overflow-hidden relative shadow-md group">
+                            <div className="aspect-square w-full bg-surface rounded-2xl overflow-hidden relative shadow-md group">
                                 <TactileReveal
                                     beforeImage={item.before}
                                     afterImage={item.after}
