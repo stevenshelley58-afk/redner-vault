@@ -63,7 +63,7 @@ const demoUsage = {
 };
 
 export default async function ProfileRoutePage() {
-  const supabase = createSupabaseServerClient();
+  const supabase = await createSupabaseServerClient();
   const { data } = await supabase.auth.getSession();
 
   // Redirect unauthenticated users to login (real routing will use Supabase session).
