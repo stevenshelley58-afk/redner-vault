@@ -29,12 +29,12 @@ export function AppShell({ children }: AppShellProps) {
                 Login
               </Button>
             </Link>
-            <Link href="/projects/new" className="hidden md:inline-flex">
+            <Link href="/projects" className="hidden md:inline-flex">
               <Button
                 variant="secondary"
                 className="text-xs"
               >
-                New project
+                My Projects
               </Button>
             </Link>
             <Link href="/profile" className="flex items-center gap-2">
