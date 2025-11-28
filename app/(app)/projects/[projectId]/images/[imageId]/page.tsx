@@ -86,6 +86,7 @@ function ImageViewport({
   draft,
   onEraseLast,
   onPlaceDraft,
+  showAnnotations,
 }: {
   version?: ImageVersion;
   onDownload: () => void;
@@ -97,6 +98,7 @@ function ImageViewport({
   draft: AnnotationDraft | null;
   onEraseLast: () => void;
   onPlaceDraft: () => void;
+  showAnnotations: boolean;
 }) {
   const [zoom, setZoom] = useState(1);
   const [position, setPosition] = useState({ x: 0, y: 0 });
@@ -292,82 +294,84 @@ function ImageViewport({
             transition: dragging ? 'none' : 'transform 80ms ease',
           }}
         />
-        <svg className="absolute inset-0 h-full w-full" viewBox="0 0 1000 1000" preserveAspectRatio="none">
-          {annotations.map((ann) => {
-            if (ann.tool === 'pen') {
-              const d = ann.points.map((p, i) => `${i === 0 ? 'M' : 'L'} ${p.x * 1000} ${p.y * 1000}`).join(' ');
-              return <path key={ann.id} d={d} stroke="#0071E3" strokeWidth={3} fill="none" strokeLinecap="round" strokeLinejoin="round" />;
-            }
-            if (ann.tool === 'arrow') {
-              const [start, end] = ann.points;
-              const dx = end.x - start.x;
-              const dy = end.y - start.y;
-              const angle = Math.atan2(dy, dx);
-              const arrowLen = 18;
-              const arrowAngle = Math.PI / 7;
-              const x2 = end.x * 1000;
-              const y2 = end.y * 1000;
-              const line = `M ${start.x * 1000} ${start.y * 1000} L ${x2} ${y2}`;
-              const arrow1 = `L ${x2 - arrowLen * Math.cos(angle - arrowAngle)} ${y2 - arrowLen * Math.sin(angle - arrowAngle)}`;
-              const arrow2 = `M ${x2} ${y2} L ${x2 - arrowLen * Math.cos(angle + arrowAngle)} ${y2 - arrowLen * Math.sin(angle + arrowAngle)}`;
-              return (
-                <g key={ann.id} stroke="#0071E3" strokeWidth={3} fill="none" strokeLinecap="round" strokeLinejoin="round">
-                  <path d={line} />
-                  <path d={arrow1} />
-                  <path d={arrow2} />
-                </g>
-              );
-            }
-            if (ann.tool === 'circle') {
-              const [start, end] = ann.points;
-              const rx = (end.x - start.x) * 1000;
-              const ry = (end.y - start.y) * 1000;
-              const r = Math.sqrt(rx * rx + ry * ry);
-              return <circle key={ann.id} cx={start.x * 1000} cy={start.y * 1000} r={r} stroke="#0071E3" strokeWidth={3} fill="none" />;
-            }
-            return null;
-          })}
-          {draft && (
-            <>
-              {draft.tool === 'pen' && (
-                <path
-                  d={draft.points.map((p, i) => `${i === 0 ? 'M' : 'L'} ${p.x * 1000} ${p.y * 1000}`).join(' ')}
-                  stroke="#0071E3"
-                  strokeWidth={2}
-                  fill="none"
-                  strokeDasharray="6 4"
-                  strokeLinecap="round"
-                />
-              )}
-              {draft.tool === 'arrow' && draft.points.length === 2 && (
-                <line
-                  x1={draft.points[0].x * 1000}
-                  y1={draft.points[0].y * 1000}
-                  x2={draft.points[1].x * 1000}
-                  y2={draft.points[1].y * 1000}
-                  stroke="#0071E3"
-                  strokeWidth={2}
-                  strokeDasharray="6 4"
-                  strokeLinecap="round"
-                />
-              )}
-              {draft.tool === 'circle' && draft.points.length === 2 && (
-                <circle
-                  cx={draft.points[0].x * 1000}
-                  cy={draft.points[0].y * 1000}
-                  r={Math.sqrt(
-                    Math.pow((draft.points[1].x - draft.points[0].x) * 1000, 2) +
-                      Math.pow((draft.points[1].y - draft.points[0].y) * 1000, 2),
-                  )}
-                  stroke="#0071E3"
-                  strokeWidth={2}
-                  strokeDasharray="6 4"
-                  fill="none"
-                />
-              )}
-            </>
-          )}
-        </svg>
+        {showAnnotations && (
+          <svg className="absolute inset-0 h-full w-full" viewBox="0 0 1000 1000" preserveAspectRatio="none">
+            {annotations.map((ann) => {
+              if (ann.tool === 'pen') {
+                const d = ann.points.map((p, i) => `${i === 0 ? 'M' : 'L'} ${p.x * 1000} ${p.y * 1000}`).join(' ');
+                return <path key={ann.id} d={d} stroke="#0071E3" strokeWidth={3} fill="none" strokeLinecap="round" strokeLinejoin="round" />;
+              }
+              if (ann.tool === 'arrow') {
+                const [start, end] = ann.points;
+                const dx = end.x - start.x;
+                const dy = end.y - start.y;
+                const angle = Math.atan2(dy, dx);
+                const arrowLen = 18;
+                const arrowAngle = Math.PI / 7;
+                const x2 = end.x * 1000;
+                const y2 = end.y * 1000;
+                const line = `M ${start.x * 1000} ${start.y * 1000} L ${x2} ${y2}`;
+                const arrow1 = `L ${x2 - arrowLen * Math.cos(angle - arrowAngle)} ${y2 - arrowLen * Math.sin(angle - arrowAngle)}`;
+                const arrow2 = `M ${x2} ${y2} L ${x2 - arrowLen * Math.cos(angle + arrowAngle)} ${y2 - arrowLen * Math.sin(angle + arrowAngle)}`;
+                return (
+                  <g key={ann.id} stroke="#0071E3" strokeWidth={3} fill="none" strokeLinecap="round" strokeLinejoin="round">
+                    <path d={line} />
+                    <path d={arrow1} />
+                    <path d={arrow2} />
+                  </g>
+                );
+              }
+              if (ann.tool === 'circle') {
+                const [start, end] = ann.points;
+                const rx = (end.x - start.x) * 1000;
+                const ry = (end.y - start.y) * 1000;
+                const r = Math.sqrt(rx * rx + ry * ry);
+                return <circle key={ann.id} cx={start.x * 1000} cy={start.y * 1000} r={r} stroke="#0071E3" strokeWidth={3} fill="none" />;
+              }
+              return null;
+            })}
+            {draft && (
+              <>
+                {draft.tool === 'pen' && (
+                  <path
+                    d={draft.points.map((p, i) => `${i === 0 ? 'M' : 'L'} ${p.x * 1000} ${p.y * 1000}`).join(' ')}
+                    stroke="#0071E3"
+                    strokeWidth={2}
+                    fill="none"
+                    strokeDasharray="6 4"
+                    strokeLinecap="round"
+                  />
+                )}
+                {draft.tool === 'arrow' && draft.points.length === 2 && (
+                  <line
+                    x1={draft.points[0].x * 1000}
+                    y1={draft.points[0].y * 1000}
+                    x2={draft.points[1].x * 1000}
+                    y2={draft.points[1].y * 1000}
+                    stroke="#0071E3"
+                    strokeWidth={2}
+                    strokeDasharray="6 4"
+                    strokeLinecap="round"
+                  />
+                )}
+                {draft.tool === 'circle' && draft.points.length === 2 && (
+                  <circle
+                    cx={draft.points[0].x * 1000}
+                    cy={draft.points[0].y * 1000}
+                    r={Math.sqrt(
+                      Math.pow((draft.points[1].x - draft.points[0].x) * 1000, 2) +
+                        Math.pow((draft.points[1].y - draft.points[0].y) * 1000, 2),
+                    )}
+                    stroke="#0071E3"
+                    strokeWidth={2}
+                    strokeDasharray="6 4"
+                    fill="none"
+                  />
+                )}
+              </>
+            )}
+          </svg>
+        )}
       </div>
     </div>
   );
@@ -459,6 +463,7 @@ export default function ImageDetailPage({ params }: { params: { projectId: strin
   const [tool, setTool] = useState<Annotation['tool'] | 'select' | 'eraser'>('select');
   const [draft, setDraft] = useState<AnnotationDraft | null>(null);
   const [noteDraft, setNoteDraft] = useState('');
+  const [showAnnotations, setShowAnnotations] = useState(true);
 
   const annotations = annotationsByVersion[activeVersion?.version_number ?? 0] ?? [];
 
@@ -554,6 +559,7 @@ export default function ImageDetailPage({ params }: { params: { projectId: strin
                 });
               }}
               onPlaceDraft={() => {}}
+              showAnnotations={showAnnotations}
             />
 
             {draft && (
@@ -608,6 +614,42 @@ export default function ImageDetailPage({ params }: { params: { projectId: strin
               activeVersion={activeVersion?.version_number}
               onAdd={handleAddComment}
             />
+            <div className="rounded-2xl border border-border-ghost bg-bg-paper px-4 py-3 space-y-3">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2 text-sm font-semibold text-text-ink">
+                  <MessageSquare className="h-4 w-4 text-text-subtle" />
+                  Annotations
+                </div>
+                <div className="flex items-center gap-2">
+                  <button
+                    onClick={() => setShowAnnotations((v) => !v)}
+                    className="text-xs text-text-subtle underline"
+                  >
+                    {showAnnotations ? 'Hide' : 'Show'}
+                  </button>
+                </div>
+              </div>
+              {annotations.length === 0 ? (
+                <p className="text-sm text-text-subtle">No annotations yet.</p>
+              ) : (
+                <div className="space-y-2">
+                  {annotations.map((ann, idx) => (
+                    <div key={ann.id} className="flex items-start justify-between gap-2 rounded-lg border border-border-ghost bg-white px-3 py-2 text-sm">
+                      <div className="flex flex-col gap-1">
+                        <div className="flex items-center gap-2">
+                          <span className="h-2 w-2 rounded-full bg-accent" />
+                          <span className="font-medium">#{idx + 1}</span>
+                          <span className="text-[11px] uppercase text-text-subtle">
+                            {ann.tool}
+                          </span>
+                        </div>
+                        <span className="text-text-subtle/80">{ann.note}</span>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
           </div>
           <div className="mt-3 flex items-center justify-between rounded-2xl border border-border-ghost bg-surface px-4 py-3">
             <div className="flex items-center gap-2 text-sm text-text-subtle">
