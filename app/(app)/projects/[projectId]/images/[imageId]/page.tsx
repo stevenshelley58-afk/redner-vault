@@ -7,10 +7,13 @@ import { useRouter } from 'next/navigation';
 import {
   AlertTriangle,
   ArrowLeft,
+  ArrowRight,
   Check,
+  Circle,
   Download,
   Maximize,
   MessageSquare,
+  Pencil,
   RotateCcw,
   Send,
   ZoomIn,
@@ -32,10 +35,15 @@ import type { ImageStatus } from '../../../../../../lib/status';
 
 type Annotation = {
   id: string;
-  x: number; // normalized 0-1
-  y: number; // normalized 0-1
+  tool: 'pen' | 'arrow' | 'circle';
+  points: { x: number; y: number }[];
   note: string;
   version_number: number;
+};
+
+type AnnotationDraft = {
+  tool: Annotation['tool'];
+  points: { x: number; y: number }[];
 };
 
 function VersionSelector({
@@ -72,17 +80,23 @@ function ImageViewport({
   onDownload,
   onFullscreen,
   annotations,
-  onAddAnnotation,
-  isAnnotating,
-  setIsAnnotating,
+  tool,
+  setTool,
+  setDraft,
+  draft,
+  onEraseLast,
+  onPlaceDraft,
 }: {
   version?: ImageVersion;
   onDownload: () => void;
   onFullscreen: () => void;
   annotations: Annotation[];
-  onAddAnnotation: (x: number, y: number) => void;
-  isAnnotating: boolean;
-  setIsAnnotating: (v: boolean) => void;
+  tool: Annotation['tool'] | 'select' | 'eraser';
+  setTool: (t: Annotation['tool'] | 'select' | 'eraser') => void;
+  setDraft: (d: AnnotationDraft | null) => void;
+  draft: AnnotationDraft | null;
+  onEraseLast: () => void;
+  onPlaceDraft: () => void;
 }) {
   const [zoom, setZoom] = useState(1);
   const [position, setPosition] = useState({ x: 0, y: 0 });
@@ -102,28 +116,45 @@ function ImageViewport({
   };
 
   const onMouseDown = (e: MouseEvent<HTMLDivElement>) => {
-    if (zoom <= 1) return;
-    setDragging(true);
-    dragStart.current = { x: e.clientX - position.x, y: e.clientY - position.y };
+    if (tool === 'select' && zoom > 1) {
+      setDragging(true);
+      dragStart.current = { x: e.clientX - position.x, y: e.clientY - position.y };
+      return;
+    }
+    if (!version) return;
+    if (tool === 'pen' || tool === 'arrow' || tool === 'circle') {
+      const bounds = (e.currentTarget as HTMLDivElement).getBoundingClientRect();
+      const x = (e.clientX - bounds.left) / bounds.width;
+      const y = (e.clientY - bounds.top) / bounds.height;
+      setDraft({ tool, points: [{ x, y }] });
+    }
   };
 
   const onMouseMove = (e: MouseEvent<HTMLDivElement>) => {
-    if (!dragging) return;
-    setPosition({
-      x: e.clientX - dragStart.current.x,
-      y: e.clientY - dragStart.current.y,
-    });
+    if (dragging) {
+      setPosition({
+        x: e.clientX - dragStart.current.x,
+        y: e.clientY - dragStart.current.y,
+      });
+      return;
+    }
+    if (draft) {
+      const bounds = (e.currentTarget as HTMLDivElement).getBoundingClientRect();
+      const x = (e.clientX - bounds.left) / bounds.width;
+      const y = (e.clientY - bounds.top) / bounds.height;
+      if (draft.tool === 'pen') {
+        setDraft({ ...draft, points: [...draft.points, { x, y }] });
+      } else {
+        setDraft({ ...draft, points: [draft.points[0], { x, y }] });
+      }
+    }
   };
 
-  const endDrag = () => setDragging(false);
-
-  const handleAnnotationClick = (e: MouseEvent<HTMLDivElement>) => {
-    if (!isAnnotating || !version) return;
-    const bounds = (e.currentTarget as HTMLDivElement).getBoundingClientRect();
-    const x = (e.clientX - bounds.left) / bounds.width;
-    const y = (e.clientY - bounds.top) / bounds.height;
-    onAddAnnotation(x, y);
-    setIsAnnotating(false);
+  const endDrag = () => {
+    if (draft) {
+      onPlaceDraft();
+    }
+    setDragging(false);
   };
 
   if (!version) {
@@ -171,13 +202,56 @@ function ImageViewport({
         </div>
       </div>
 
+      <div className="flex flex-wrap items-center gap-2 rounded-2xl border border-border-ghost bg-bg-paper px-3 py-2 text-sm text-text-subtle">
+        <span className="text-xs font-semibold uppercase tracking-wide text-text-muted">Annotate</span>
+        <div className="flex items-center gap-2">
+          <button
+            onClick={() => setTool('pen')}
+            className={`flex h-9 w-9 items-center justify-center rounded-lg border ${tool === 'pen' ? 'border-accent bg-accent/10 text-accent' : 'border-border-ghost bg-white text-text-ink'} transition`}
+            title="Freehand"
+          >
+            <Pencil className="h-4 w-4" />
+          </button>
+          <button
+            onClick={() => setTool('arrow')}
+            className={`flex h-9 w-9 items-center justify-center rounded-lg border ${tool === 'arrow' ? 'border-accent bg-accent/10 text-accent' : 'border-border-ghost bg-white text-text-ink'} transition`}
+            title="Arrow"
+          >
+            <ArrowRight className="h-4 w-4" />
+          </button>
+          <button
+            onClick={() => setTool('circle')}
+            className={`flex h-9 w-9 items-center justify-center rounded-lg border ${tool === 'circle' ? 'border-accent bg-accent/10 text-accent' : 'border-border-ghost bg-white text-text-ink'} transition`}
+            title="Circle"
+          >
+            <Circle className="h-4 w-4" />
+          </button>
+          <button
+            onClick={() => {
+              setTool('eraser');
+              onEraseLast();
+            }}
+            className={`flex h-9 w-9 items-center justify-center rounded-lg border ${tool === 'eraser' ? 'border-accent bg-accent/10 text-accent' : 'border-border-ghost bg-white text-text-ink'} transition`}
+            title="Erase last"
+          >
+            🧽
+          </button>
+          <button
+            onClick={() => setTool('select')}
+            className={`flex h-9 px-3 items-center justify-center rounded-lg border ${tool === 'select' ? 'border-accent bg-accent/10 text-accent' : 'border-border-ghost bg-white text-text-ink'} transition text-xs`}
+            title="Pan"
+          >
+            Pan
+          </button>
+        </div>
+      </div>
+
       <div
-        className={`relative flex min-h-[320px] items-center justify-center overflow-hidden rounded-2xl border border-border-ghost bg-black ${zoom > 1 ? 'cursor-grab' : 'cursor-default'}`}
+        className={`relative flex min-h-[320px] items-center justify-center overflow-hidden rounded-2xl border border-border-ghost bg-black ${zoom > 1 ? 'cursor-grab' : 'cursor-crosshair'}`}
         onMouseDown={onMouseDown}
         onMouseMove={onMouseMove}
         onMouseUp={endDrag}
         onMouseLeave={endDrag}
-        onClick={handleAnnotationClick}
       >
         <img
           src={version.output_url}
@@ -189,17 +263,82 @@ function ImageViewport({
             transition: dragging ? 'none' : 'transform 80ms ease',
           }}
         />
-        {annotations.map((ann) => (
-          <div
-            key={ann.id}
-            className="absolute h-4 w-4 -translate-x-1/2 -translate-y-1/2 rounded-full border-2 border-white bg-accent shadow"
-            style={{ left: `${ann.x * 100}%`, top: `${ann.y * 100}%` }}
-            title={ann.note}
-          />
-        ))}
-        {isAnnotating && (
-          <div className="absolute inset-0 bg-accent/10 pointer-events-none" />
-        )}
+        <svg className="absolute inset-0 h-full w-full" viewBox="0 0 1000 1000" preserveAspectRatio="none">
+          {annotations.map((ann) => {
+            if (ann.tool === 'pen') {
+              const d = ann.points.map((p, i) => `${i === 0 ? 'M' : 'L'} ${p.x * 1000} ${p.y * 1000}`).join(' ');
+              return <path key={ann.id} d={d} stroke="#0071E3" strokeWidth={3} fill="none" strokeLinecap="round" strokeLinejoin="round" />;
+            }
+            if (ann.tool === 'arrow') {
+              const [start, end] = ann.points;
+              const dx = end.x - start.x;
+              const dy = end.y - start.y;
+              const angle = Math.atan2(dy, dx);
+              const arrowLen = 18;
+              const arrowAngle = Math.PI / 7;
+              const x2 = end.x * 1000;
+              const y2 = end.y * 1000;
+              const line = `M ${start.x * 1000} ${start.y * 1000} L ${x2} ${y2}`;
+              const arrow1 = `L ${x2 - arrowLen * Math.cos(angle - arrowAngle)} ${y2 - arrowLen * Math.sin(angle - arrowAngle)}`;
+              const arrow2 = `M ${x2} ${y2} L ${x2 - arrowLen * Math.cos(angle + arrowAngle)} ${y2 - arrowLen * Math.sin(angle + arrowAngle)}`;
+              return (
+                <g key={ann.id} stroke="#0071E3" strokeWidth={3} fill="none" strokeLinecap="round" strokeLinejoin="round">
+                  <path d={line} />
+                  <path d={arrow1} />
+                  <path d={arrow2} />
+                </g>
+              );
+            }
+            if (ann.tool === 'circle') {
+              const [start, end] = ann.points;
+              const rx = (end.x - start.x) * 1000;
+              const ry = (end.y - start.y) * 1000;
+              const r = Math.sqrt(rx * rx + ry * ry);
+              return <circle key={ann.id} cx={start.x * 1000} cy={start.y * 1000} r={r} stroke="#0071E3" strokeWidth={3} fill="none" />;
+            }
+            return null;
+          })}
+          {draft && (
+            <>
+              {draft.tool === 'pen' && (
+                <path
+                  d={draft.points.map((p, i) => `${i === 0 ? 'M' : 'L'} ${p.x * 1000} ${p.y * 1000}`).join(' ')}
+                  stroke="#0071E3"
+                  strokeWidth={2}
+                  fill="none"
+                  strokeDasharray="6 4"
+                  strokeLinecap="round"
+                />
+              )}
+              {draft.tool === 'arrow' && draft.points.length === 2 && (
+                <line
+                  x1={draft.points[0].x * 1000}
+                  y1={draft.points[0].y * 1000}
+                  x2={draft.points[1].x * 1000}
+                  y2={draft.points[1].y * 1000}
+                  stroke="#0071E3"
+                  strokeWidth={2}
+                  strokeDasharray="6 4"
+                  strokeLinecap="round"
+                />
+              )}
+              {draft.tool === 'circle' && draft.points.length === 2 && (
+                <circle
+                  cx={draft.points[0].x * 1000}
+                  cy={draft.points[0].y * 1000}
+                  r={Math.sqrt(
+                    Math.pow((draft.points[1].x - draft.points[0].x) * 1000, 2) +
+                      Math.pow((draft.points[1].y - draft.points[0].y) * 1000, 2),
+                  )}
+                  stroke="#0071E3"
+                  strokeWidth={2}
+                  strokeDasharray="6 4"
+                  fill="none"
+                />
+              )}
+            </>
+          )}
+        </svg>
       </div>
     </div>
   );
@@ -288,7 +427,9 @@ export default function ImageDetailPage({ params }: { params: { projectId: strin
   const [imageStatus, setImageStatus] = useState<ImageStatus>(image?.status ?? 'draft');
   const [fullscreen, setFullscreen] = useState(false);
   const [annotationsByVersion, setAnnotationsByVersion] = useState<Record<number, Annotation[]>>({});
-  const [isAnnotating, setIsAnnotating] = useState(false);
+  const [tool, setTool] = useState<Annotation['tool'] | 'select' | 'eraser'>('select');
+  const [draft, setDraft] = useState<AnnotationDraft | null>(null);
+  const [noteDraft, setNoteDraft] = useState('');
 
   const annotations = annotationsByVersion[activeVersion?.version_number ?? 0] ?? [];
 
@@ -366,30 +507,73 @@ export default function ImageDetailPage({ params }: { params: { projectId: strin
 
         <div className="mt-4 space-y-3">
           <VersionSelector versions={versions} activeId={activeVersion?.id} onSelect={setActiveVersion} />
-          <div className="grid gap-3 md:grid-cols-[2fr,1fr]">
+          <div className="flex flex-col gap-3">
             <ImageViewport
               version={activeVersion}
               onDownload={() => activeVersion && window.open(activeVersion.output_url, '_blank')}
               onFullscreen={() => setFullscreen(true)}
               annotations={annotations}
-              onAddAnnotation={(x, y) => {
-                const note = window.prompt('Add a note for this annotation:');
-                if (!note) return;
+              tool={tool}
+              setTool={setTool}
+              setDraft={setDraft}
+              draft={draft}
+              onEraseLast={() => {
                 if (!activeVersion) return;
                 setAnnotationsByVersion((prev) => {
                   const existing = prev[activeVersion.version_number] ?? [];
-                  return {
-                    ...prev,
-                    [activeVersion.version_number]: [
-                      ...existing,
-                      { id: crypto.randomUUID(), x, y, note, version_number: activeVersion.version_number },
-                    ],
-                  };
+                  return { ...prev, [activeVersion.version_number]: existing.slice(0, -1) };
                 });
               }}
-              isAnnotating={isAnnotating}
-              setIsAnnotating={setIsAnnotating}
+              onPlaceDraft={() => {}}
             />
+
+            {draft && (
+              <div className="rounded-2xl border border-border-ghost bg-bg-paper p-3 flex flex-col gap-2">
+                <div className="flex items-center justify-between text-sm font-semibold text-text-ink">
+                  <span>Add note to annotation</span>
+                  <Button variant="ghost" className="px-2 py-1 text-xs" onClick={() => { setDraft(null); setNoteDraft(''); setTool('select'); }}>
+                    Cancel
+                  </Button>
+                </div>
+                <TextArea
+                  placeholder="Describe your note..."
+                  value={noteDraft}
+                  onChange={(e) => setNoteDraft(e.target.value)}
+                  rows={3}
+                />
+                <div className="flex justify-end">
+                  <Button
+                    onClick={() => {
+                      if (!activeVersion || !draft) return;
+                      if (!noteDraft.trim()) return;
+                      setAnnotationsByVersion((prev) => {
+                        const existing = prev[activeVersion.version_number] ?? [];
+                        return {
+                          ...prev,
+                          [activeVersion.version_number]: [
+                            ...existing,
+                            {
+                              id: crypto.randomUUID(),
+                              tool: draft.tool,
+                              points: draft.points,
+                              note: noteDraft.trim(),
+                              version_number: activeVersion.version_number,
+                            },
+                          ],
+                        };
+                      });
+                      setDraft(null);
+                      setNoteDraft('');
+                      setTool('select');
+                    }}
+                    disabled={!noteDraft.trim()}
+                  >
+                    Save annotation
+                  </Button>
+                </div>
+              </div>
+            )}
+
             <CommentsPanel
               comments={comments}
               activeVersion={activeVersion?.version_number}
@@ -413,36 +597,6 @@ export default function ImageDetailPage({ params }: { params: { projectId: strin
                 </Button>
               )}
             </div>
-          </div>
-          <div className="rounded-2xl border border-border-ghost bg-bg-paper px-4 py-3 space-y-3">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-2 text-sm font-semibold text-text-ink">
-                <MessageSquare className="h-4 w-4 text-text-subtle" />
-                Annotations
-              </div>
-              <Button
-                variant={isAnnotating ? 'secondary' : 'ghost'}
-                className="px-3 py-1 text-xs"
-                onClick={() => setIsAnnotating((v) => !v)}
-              >
-                {isAnnotating ? 'Click image to place' : 'Add annotation'}
-              </Button>
-            </div>
-            {annotations.length === 0 ? (
-              <p className="text-sm text-text-subtle">No annotations yet. Click “Add annotation” then click on the image.</p>
-            ) : (
-              <div className="space-y-2">
-                {annotations.map((ann, idx) => (
-                  <div key={ann.id} className="flex items-center justify-between rounded-lg border border-border-ghost bg-white px-3 py-2 text-sm">
-                    <div className="flex items-center gap-2">
-                      <span className="h-2 w-2 rounded-full bg-accent" />
-                      <span className="font-medium">#{idx + 1}</span>
-                      <span className="text-text-subtle/80">{ann.note}</span>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            )}
           </div>
         </div>
       </div>
