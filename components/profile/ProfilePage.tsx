@@ -11,6 +11,7 @@ import { ProjectsUsageSection, type ProjectsUsage } from './sections/ProjectsUsa
 import { SecuritySection } from './sections/SecuritySection';
 import { SupportSection } from './sections/SupportSection';
 import { LegalSection } from './sections/LegalSection';
+import { createSupabaseBrowserClient } from '../../lib/supabase/client';
 
 type AccordionId =
   | 'personal'
@@ -59,25 +60,20 @@ export function ProfilePage({
   const [brand, setBrand] = useState<BrandInfo>(initialBrand);
   const [billing] = useState<BillingInfo>(initialBilling);
   const [usage] = useState<ProjectsUsage>(initialUsage);
-  const [openAccordions, setOpenAccordions] = useState<AccordionId[]>([
-    'personal',
-    'brand',
-    'billing',
-  ]);
-
-  useEffect(() => {
+  const [openAccordions, setOpenAccordions] = useState<AccordionId[]>(() => {
     try {
-      const stored = window.localStorage.getItem(ACCORDION_STORAGE_KEY);
+      const stored = typeof window !== 'undefined' ? window.localStorage.getItem(ACCORDION_STORAGE_KEY) : null;
       if (stored) {
         const parsed = JSON.parse(stored);
         if (Array.isArray(parsed)) {
-          setOpenAccordions(parsed);
+          return parsed as AccordionId[];
         }
       }
     } catch {
       // ignore
     }
-  }, []);
+    return ['personal', 'brand', 'billing'];
+  });
 
   useEffect(() => {
     try {
@@ -93,8 +89,16 @@ export function ProfilePage({
     );
   };
 
-  const handleLogout = () => {
-    // TODO: wire to Supabase sign-out
+  const handleLogout = async () => {
+    try {
+      const supabase = createSupabaseBrowserClient();
+      await supabase.auth.signOut();
+      if (typeof window !== 'undefined') {
+        window.location.href = '/login';
+      }
+    } catch {
+      // ignore
+    }
   };
 
   return (
@@ -178,11 +182,10 @@ export function ProfilePage({
           Log out
         </Button>
         <div className="flex flex-col items-center gap-1 text-[11px] text-text-subtle/80 md:items-end">
-          <span>Render Vault · Profile</span>
+          <span>Render Vault - Profile</span>
           <span>v1.0.0</span>
         </div>
       </div>
     </div>
   );
 }
-

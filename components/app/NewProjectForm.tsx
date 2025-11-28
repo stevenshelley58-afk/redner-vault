@@ -4,51 +4,44 @@ import { useState } from 'react';
 import { Input } from '../ui/Input';
 import { TextArea } from '../ui/TextArea';
 import { Button } from '../ui/Button';
-import type { ProjectListItem, ProjectType } from '../../lib/project-types';
+import type { ProjectType } from '../../lib/project-types';
 
 type NewProjectFormProps = {
-  onCreate: (project: ProjectListItem) => void;
+  onCreate: (input: NewProjectFormValues) => Promise<void> | void;
   onCancel?: () => void;
   submitLabel?: string;
 };
 
-const defaultForm = {
+export type NewProjectFormValues = {
+  name: string;
+  project_type: ProjectType;
+  brief: string;
+  due_date: string;
+};
+
+const defaultForm: NewProjectFormValues = {
   name: '',
-  project_type: 'image_render' as ProjectType,
+  project_type: 'image_render',
   brief: '',
   due_date: '',
 };
 
-function makeFallbackName() {
-  const now = new Date();
-  const date = now.toISOString().slice(0, 10);
-  const time = now.toTimeString().slice(0, 5);
-  return `New project ${date} ${time}`;
-}
-
-function currentBillingPeriod() {
-  const now = new Date();
-  return `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`;
-}
-
 export function NewProjectForm({ onCreate, onCancel, submitLabel = 'Create project' }: NewProjectFormProps) {
-  const [form, setForm] = useState(defaultForm);
+  const [form, setForm] = useState<NewProjectFormValues>(defaultForm);
+  const [submitting, setSubmitting] = useState(false);
+  const [error, setError] = useState('');
 
-  const handleSubmit = () => {
-    const project: ProjectListItem = {
-      id: crypto.randomUUID(),
-      name: form.name.trim() || makeFallbackName(),
-      project_type: form.project_type,
-      status: 'draft',
-      brief: form.brief.trim(),
-      due_date: form.due_date || null,
-      updated_at: new Date().toISOString(),
-      images_count: 0,
-      latest_version: 0,
-      billing_period_label: currentBillingPeriod(),
-    };
-    onCreate(project);
-    setForm(defaultForm);
+  const handleSubmit = async () => {
+    setSubmitting(true);
+    setError('');
+    try {
+      await onCreate(form);
+      setForm(defaultForm);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Failed to create project');
+    } finally {
+      setSubmitting(false);
+    }
   };
 
   return (
@@ -96,13 +89,15 @@ export function NewProjectForm({ onCreate, onCancel, submitLabel = 'Create proje
 
       <div className="flex justify-end gap-3">
         {onCancel && (
-          <Button variant="ghost" onClick={onCancel}>
+          <Button variant="ghost" onClick={onCancel} disabled={submitting}>
             Cancel
           </Button>
         )}
-        <Button onClick={handleSubmit}>{submitLabel}</Button>
+        <Button onClick={handleSubmit} disabled={submitting}>
+          {submitting ? 'Saving...' : submitLabel}
+        </Button>
       </div>
+      {error && <p className="text-sm text-red-600">{error}</p>}
     </div>
   );
 }
-

@@ -1,25 +1,24 @@
 'use client';
 
-import { useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import type { ComponentType } from 'react';
-import { Calendar, Image, Layers, Plus, Search, Sparkles } from 'lucide-react';
+import { Calendar, Image as ImageIcon, Layers, Plus, Search, Sparkles } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import clsx from 'clsx';
 import { Button } from '../../../components/ui/Button';
 import { Badge } from '../../../components/ui/Badge';
 import { Input } from '../../../components/ui/Input';
 import { StatusPill } from '../../../components/app/StatusPill';
-import { NewProjectForm } from '../../../components/app/NewProjectForm';
+import { NewProjectForm, type NewProjectFormValues } from '../../../components/app/NewProjectForm';
 import { formatDate, formatRelativeTime } from '../../../lib/date';
-import { loadProjectsFromStorage, saveProjectsToStorage } from '../../../lib/project-storage';
-import { PROJECT_SEED } from '../../../lib/project-seeds';
-import type { ProjectListItem, ProjectType } from '../../../lib/project-types';
+import type { ProjectType } from '../../../lib/project-types';
 import type { ProjectStatus } from '../../../lib/status';
+import type { ProjectRecord } from '../../../lib/backend-types';
 
 type FilterKey = 'all' | 'active' | 'draft' | 'completed';
 
 const PROJECT_TYPES: Record<ProjectType, { label: string; badge: string; icon: ComponentType<{ className?: string }> }> = {
-  image_render: { label: 'Image render', badge: 'bg-[#e8eef9] text-[#3f5f82] border border-white/80', icon: Image },
+  image_render: { label: 'Image render', badge: 'bg-[#e8eef9] text-[#3f5f82] border border-white/80', icon: ImageIcon },
   website_build: { label: 'Website build', badge: 'bg-[#e9e7ff] text-[#4d3fb3] border border-white/80', icon: Layers },
   other: { label: 'Other', badge: 'bg-[#eef2f6] text-[#445168] border border-white/80', icon: Layers },
 };
@@ -64,7 +63,7 @@ function FilterTabs({
   );
 }
 
-function ProjectCard({ project }: { project: ProjectListItem }) {
+function ProjectCard({ project }: { project: ProjectRecord }) {
   const router = useRouter();
   const typeConfig = PROJECT_TYPES[project.project_type];
 
@@ -80,14 +79,14 @@ function ProjectCard({ project }: { project: ProjectListItem }) {
             typeConfig?.badge ?? 'bg-[#eef2f6] text-[#445168] border border-white/80',
           )}
         >
-          {typeConfig?.icon ? <typeConfig.icon className="h-5 w-5" /> : <Image className="h-5 w-5" />}
+          {typeConfig?.icon ? <typeConfig.icon className="h-5 w-5" /> : <ImageIcon className="h-5 w-5" />}
         </div>
         <div className="flex flex-1 flex-col gap-1">
           <div className="flex items-center gap-2">
             <span className="text-xs font-semibold uppercase tracking-wide text-[#7e8aa7]">
               {typeConfig?.label ?? 'Project'}
             </span>
-            <span className="text-[11px] text-[#9aa5bf]">{project.billing_period_label}</span>
+            <span className="text-[11px] text-[#9aa5bf]">{project.billing_period_label || '—'}</span>
           </div>
           <div className="flex items-center gap-2">
             <h3 className="text-lg font-semibold leading-tight text-[#1b2559]">{project.name}</h3>
@@ -104,7 +103,7 @@ function ProjectCard({ project }: { project: ProjectListItem }) {
       <div className="flex items-center justify-between text-xs text-[#5b6680]">
         <div className="flex items-center gap-4">
           <div className="inline-flex items-center gap-1 rounded-full border border-white/70 bg-[#f5f7fb] px-2 py-1 text-xs shadow-sm">
-            <Image className="h-3.5 w-3.5 text-[#7e8aa7]" />
+            <ImageIcon className="h-3.5 w-3.5 text-[#7e8aa7]" />
             {project.images_count} images
           </div>
           <div className="inline-flex items-center gap-1 rounded-full border border-white/70 bg-[#f5f7fb] px-2 py-1 text-xs shadow-sm">
@@ -140,7 +139,7 @@ function EmptyState({ onCreate }: { onCreate: () => void }) {
   return (
     <div className="flex flex-col items-center justify-center rounded-[22px] border border-dashed border-[#d4e0f0] bg-white/90 px-8 py-12 text-center shadow-[0_14px_32px_rgba(112,144,176,0.12)]">
       <div className="mb-3 flex h-12 w-12 items-center justify-center rounded-full bg-[#f5f7fb] text-[#4f78a5] shadow-inner">
-        <Image className="h-5 w-5" />
+        <ImageIcon className="h-5 w-5" />
       </div>
       <h3 className="text-lg font-semibold text-[#1b2559]">No projects yet</h3>
       <p className="mt-2 max-w-sm text-sm text-[#55607a]">
@@ -164,7 +163,7 @@ function NewProjectSheet({
 }: {
   open: boolean;
   onClose: () => void;
-  onCreate: (project: ProjectListItem) => void;
+  onCreate: (input: NewProjectFormValues) => Promise<void>;
 }) {
   if (!open) return null;
 
@@ -186,8 +185,8 @@ function NewProjectSheet({
 
         <div className="mt-4 space-y-3">
           <NewProjectForm
-            onCreate={(project) => {
-              onCreate(project);
+            onCreate={async (input) => {
+              await onCreate(input);
               onClose();
             }}
             onCancel={onClose}
@@ -199,21 +198,37 @@ function NewProjectSheet({
 }
 
 export default function ProjectsPage() {
-  const [projects, setProjects] = useState<ProjectListItem[]>(PROJECT_SEED);
+  const router = useRouter();
+  const [projects, setProjects] = useState<ProjectRecord[]>([]);
   const [search, setSearch] = useState('');
   const [filter, setFilter] = useState<FilterKey>('all');
   const [sheetOpen, setSheetOpen] = useState(false);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const [now] = useState(() => Date.now());
 
-  useEffect(() => {
-    const stored = loadProjectsFromStorage();
-    if (stored) {
-      setProjects(stored);
+  const loadProjects = useCallback(async () => {
+    setLoading(true);
+    setError(null);
+    const res = await fetch('/api/projects');
+    if (res.status === 401) {
+      router.push('/login');
+      return;
     }
-  }, []);
+    const data = await res.json();
+    if (!res.ok) {
+      setError(data.error ?? 'Unable to load projects');
+      setLoading(false);
+      return;
+    }
+    setProjects(data.projects ?? []);
+    setLoading(false);
+  }, [router]);
 
   useEffect(() => {
-    saveProjectsToStorage(projects);
-  }, [projects]);
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    loadProjects();
+  }, [loadProjects]);
 
   const counts = useMemo(() => {
     const base: Record<FilterKey, number> = { all: projects.length, active: 0, draft: 0, completed: 0 };
@@ -242,7 +257,6 @@ export default function ProjectsPage() {
   const stats = useMemo(() => {
     const activeStatuses: ProjectStatus[] = ['in_review', 'in_progress'];
     const awaitingStatuses: ProjectStatus[] = ['awaiting_client'];
-    const now = Date.now();
 
     const withDue = projects
       .filter((p) => p.due_date)
@@ -262,7 +276,27 @@ export default function ProjectsPage() {
       images: projects.reduce((sum, p) => sum + (p.images_count || 0), 0),
       nextDue,
     };
-  }, [projects]);
+  }, [projects, now]);
+
+  const handleCreateProject = async (input: NewProjectFormValues) => {
+    const res = await fetch('/api/projects', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(input),
+    });
+
+    if (res.status === 401) {
+      router.push('/login');
+      return;
+    }
+
+    const data = await res.json();
+    if (!res.ok) {
+      throw new Error(data.error ?? 'Failed to create project');
+    }
+
+    setProjects((prev) => [data.project, ...prev]);
+  };
 
   return (
     <div className="space-y-6">
@@ -303,7 +337,7 @@ export default function ProjectsPage() {
                 {stats.nextDue ? `Next due: ${formatDate(stats.nextDue.due_date ?? '')}` : 'No due dates set'}
               </div>
               <div className="inline-flex items-center gap-2 rounded-full bg-white/10 px-3 py-1.5 backdrop-blur">
-                <Image className="h-4 w-4" />
+                <ImageIcon className="h-4 w-4" />
                 {stats.images} images delivered
               </div>
             </div>
@@ -340,7 +374,17 @@ export default function ProjectsPage() {
         </div>
       </section>
 
-      {filtered.length === 0 ? (
+      {error && (
+        <div className="rounded-xl border border-rose-100 bg-rose-50 px-4 py-3 text-sm text-rose-700 shadow-sm">
+          {error}
+        </div>
+      )}
+
+      {loading ? (
+        <div className="rounded-[22px] border border-dashed border-border-ghost bg-white/90 px-6 py-8 text-center text-sm text-text-subtle">
+          Loading your projects...
+        </div>
+      ) : filtered.length === 0 ? (
         <EmptyState onCreate={() => setSheetOpen(true)} />
       ) : (
         <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
@@ -353,7 +397,7 @@ export default function ProjectsPage() {
       <NewProjectSheet
         open={sheetOpen}
         onClose={() => setSheetOpen(false)}
-        onCreate={(p) => setProjects((prev) => [p, ...prev])}
+        onCreate={handleCreateProject}
       />
     </div>
   );

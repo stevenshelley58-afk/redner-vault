@@ -17,11 +17,7 @@ export function ProjectsUsageSection({ value }: ProjectsUsageSectionProps) {
       <StatBlock label="Completed images" value={value.completed_images} />
       <StatBlock
         label="Last activity"
-        value={
-          value.last_activity
-            ? new Date(value.last_activity).toLocaleDateString()
-            : '—'
-        }
+        value={value.last_activity ? new Date(value.last_activity).toLocaleDateString() : '—'}
       />
     </div>
   );
@@ -35,4 +31,3 @@ function StatBlock({ label, value }: { label: string; value: number | string }) 
     </div>
   );
 }
-

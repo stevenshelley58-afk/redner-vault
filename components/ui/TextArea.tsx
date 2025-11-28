@@ -3,7 +3,7 @@
 import type { TextareaHTMLAttributes } from 'react';
 import clsx from 'clsx';
 
-interface TextAreaProps extends TextareaHTMLAttributes<HTMLTextAreaElement> {}
+type TextAreaProps = TextareaHTMLAttributes<HTMLTextAreaElement>;
 
 export function TextArea({ className, ...props }: TextAreaProps) {
   return (
@@ -19,4 +19,3 @@ export function TextArea({ className, ...props }: TextAreaProps) {
     />
   );
 }
-

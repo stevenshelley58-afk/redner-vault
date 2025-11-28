@@ -12,16 +12,16 @@ export default function ProofWall() {
         {
             title: "Furniture",
             // Before: Plain chair in empty room / bad angle
-            before: "/images/mirror-before.png",
+            before: "/images/meliss allen sample 2.png",
             // After: Styled Room
-            after: "/images/mirror-after.png"
+            after: "/images/melissa allen sample (1).png"
         },
         {
             title: "Toys",
             // Before: Simple/Boring device photo
-            before: "/images/toys-before.png",
+            before: "/images/bag.png",
             // After: Final Product Render
-            after: "/images/toys-after.png"
+            after: "/images/bag (1).png"
         }
     ];
 

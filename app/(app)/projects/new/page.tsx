@@ -2,19 +2,29 @@
 
 import { ArrowLeft } from 'lucide-react';
 import { useRouter } from 'next/navigation';
-import { NewProjectForm } from '../../../../components/app/NewProjectForm';
-import { loadProjectsFromStorage, saveProjectsToStorage } from '../../../../lib/project-storage';
-import { PROJECT_SEED } from '../../../../lib/project-seeds';
-import type { ProjectListItem } from '../../../../lib/project-types';
+import { NewProjectForm, type NewProjectFormValues } from '../../../../components/app/NewProjectForm';
 
 export default function NewProjectPage() {
   const router = useRouter();
 
-  const handleCreate = (project: ProjectListItem) => {
-    const existing = loadProjectsFromStorage() ?? PROJECT_SEED;
-    const next = [project, ...existing];
-    saveProjectsToStorage(next);
-    router.push('/projects');
+  const handleCreate = async (input: NewProjectFormValues) => {
+    const res = await fetch('/api/projects', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(input),
+    });
+
+    if (res.status === 401) {
+      router.push('/login');
+      return;
+    }
+
+    const data = await res.json();
+    if (!res.ok) {
+      throw new Error(data.error ?? 'Failed to create project');
+    }
+
+    router.push(`/projects/${data.project.id}`);
   };
 
   return (

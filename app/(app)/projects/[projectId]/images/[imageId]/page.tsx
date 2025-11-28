@@ -9,14 +9,11 @@ import { StatusPill } from '../../../../../../components/app/StatusPill';
 import { Button } from '../../../../../../components/ui/Button';
 import { TextArea } from '../../../../../../components/ui/TextArea';
 import { formatDateTime, formatRelativeTime } from '../../../../../../lib/date';
-import {
-  demoImageComments,
-  demoImageVersions,
-  demoImages,
-  demoProject,
-  type ImageComment,
-  type ImageVersion,
-} from '../../../../../../lib/demo-data';
+import type {
+  ImageCommentRecord,
+  ImageVersionRecord,
+  ProjectImageRecord,
+} from '../../../../../../lib/backend-types';
 import type { ImageStatus } from '../../../../../../lib/status';
 
 type Annotation = {
@@ -26,6 +23,7 @@ type Annotation = {
   note: string;
   version_number: number;
   color: string;
+  hidden?: boolean;
 };
 
 type AnnotationDraft = {
@@ -40,9 +38,9 @@ function VersionSelector({
   activeId,
   onSelect,
 }: {
-  versions: ImageVersion[];
+  versions: ImageVersionRecord[];
   activeId?: string;
-  onSelect: (version: ImageVersion) => void;
+  onSelect: (version: ImageVersionRecord) => void;
 }) {
   return (
     <div className="flex gap-2 overflow-x-auto pb-1">
@@ -76,7 +74,7 @@ function ImageViewport({
   showAnnotations,
   color,
 }: {
-  version?: ImageVersion;
+  version?: ImageVersionRecord;
   onDownload: () => void;
   onFullscreen: () => void;
   annotations: Annotation[];
@@ -88,21 +86,12 @@ function ImageViewport({
   color: string;
 }) {
   const [zoom, setZoom] = useState(1);
-  const [position, setPosition] = useState({ x: 0, y: 0 });
-  const [dragging, setDragging] = useState(false);
-  const dragStart = useRef({ x: 0, y: 0 });
   const isDrawing = useRef(false);
-
-  useEffect(() => {
-    setZoom(1);
-    setPosition({ x: 0, y: 0 });
-  }, [version?.id]);
 
   const handleZoomIn = () => setZoom((z) => Math.min(z + 0.25, 3));
   const handleZoomOut = () => setZoom((z) => Math.max(z - 0.25, 0.5));
   const reset = () => {
     setZoom(1);
-    setPosition({ x: 0, y: 0 });
   };
 
   const startDrawing = (clientX: number, clientY: number, target: HTMLDivElement) => {
@@ -115,13 +104,6 @@ function ImageViewport({
   };
 
   const continueDrawing = (clientX: number, clientY: number, target: HTMLDivElement) => {
-    if (dragging) {
-      setPosition({
-        x: clientX - dragStart.current.x,
-        y: clientY - dragStart.current.y,
-      });
-      return;
-    }
     if (!isDrawing.current || !draft) return;
     const bounds = target.getBoundingClientRect();
     const x = (clientX - bounds.left) / bounds.width;
@@ -134,10 +116,10 @@ function ImageViewport({
       onPlaceDraft();
     }
     isDrawing.current = false;
-    setDragging(false);
   };
 
   const onMouseDown = (e: MouseEvent<HTMLDivElement>) => {
+    e.preventDefault();
     startDrawing(e.clientX, e.clientY, e.currentTarget);
   };
 
@@ -148,6 +130,7 @@ function ImageViewport({
   const onMouseUp = () => stopDrawing();
 
   const onTouchStart = (e: TouchEvent<HTMLDivElement>) => {
+    e.preventDefault();
     const touch = e.touches[0];
     if (!touch) return;
     startDrawing(touch.clientX, touch.clientY, e.currentTarget);
@@ -206,7 +189,7 @@ function ImageViewport({
         </div>
       </div>
 
-      <div className="flex flex-wrap items-center gap-2 rounded-2xl border border-border-ghost bg-bg-paper px-3 py-2 text-sm text-text-subtle">
+      <div className="flex flex-wrap items-center gap-3 rounded-2xl border border-border-ghost bg-bg-paper px-3 py-2 text-sm text-text-subtle">
         <span className="text-xs font-semibold uppercase tracking-wide text-text-muted">Annotate</span>
         <div className="flex items-center gap-2">
           <span className="text-xs text-text-subtle">Draw to add</span>
@@ -215,17 +198,17 @@ function ImageViewport({
             className="flex h-9 w-9 items-center justify-center rounded-lg border border-border-ghost bg-white text-text-ink transition hover:bg-surface"
             title="Erase last"
           >
-            🧽
+            <RotateCcw className="h-4 w-4" />
           </button>
         </div>
         <div className="flex items-center gap-2">
-          <span className="text-xs text-text-subtle">Color</span>
+          <span className="text-xs text-text-subtle">Next color</span>
           <span className="h-6 w-6 rounded-full border border-border-ghost" style={{ backgroundColor: color }} />
         </div>
       </div>
 
       <div
-        className={`relative flex min-h-[320px] items-center justify-center overflow-hidden rounded-2xl border border-border-ghost bg-black ${zoom > 1 ? 'cursor-grab' : 'cursor-crosshair'}`}
+        className="relative flex min-h-[320px] items-center justify-center overflow-hidden rounded-2xl border border-border-ghost bg-black cursor-crosshair"
         onMouseDown={onMouseDown}
         onMouseMove={onMouseMove}
         onMouseUp={onMouseUp}
@@ -240,16 +223,18 @@ function ImageViewport({
           className="select-none object-contain"
           draggable={false}
           style={{
-            transform: `translate(${position.x}px, ${position.y}px) scale(${zoom})`,
-            transition: dragging ? 'none' : 'transform 80ms ease',
+            transform: `scale(${zoom})`,
+            transition: 'transform 80ms ease',
           }}
         />
         {showAnnotations && (
           <svg className="absolute inset-0 h-full w-full" viewBox="0 0 1000 1000" preserveAspectRatio="none">
-            {annotations.map((ann) => {
-              const d = ann.points.map((p, i) => `${i === 0 ? 'M' : 'L'} ${p.x * 1000} ${p.y * 1000}`).join(' ');
-              return <path key={ann.id} d={d} stroke={ann.color} strokeWidth={3} fill="none" strokeLinecap="round" strokeLinejoin="round" />;
-            })}
+            {annotations
+              .filter((ann) => !ann.hidden)
+              .map((ann) => {
+                const d = ann.points.map((p, i) => `${i === 0 ? 'M' : 'L'} ${p.x * 1000} ${p.y * 1000}`).join(' ');
+                return <path key={ann.id} d={d} stroke={ann.color} strokeWidth={3} fill="none" strokeLinecap="round" strokeLinejoin="round" />;
+              })}
             {draft && (
               <path
                 d={draft.points.map((p, i) => `${i === 0 ? 'M' : 'L'} ${p.x * 1000} ${p.y * 1000}`).join(' ')}
@@ -272,7 +257,7 @@ function CommentsPanel({
   activeVersion,
   onAdd,
 }: {
-  comments: ImageComment[];
+  comments: ImageCommentRecord[];
   activeVersion?: number;
   onAdd: (body: string) => void;
 }) {
@@ -339,25 +324,114 @@ function CommentsPanel({
 
 export default function ImageDetailPage({ params }: { params: { projectId: string; imageId: string } }) {
   const router = useRouter();
-  const fallbackImage = demoImages[0];
-  const image = demoImages.find((img) => img.id === params.imageId) ?? fallbackImage;
-  const versions = useMemo(
-    () => (demoImageVersions[image.id] ?? []).sort((a, b) => b.version_number - a.version_number),
-    [image.id],
-  );
-  const [activeVersion, setActiveVersion] = useState<ImageVersion | undefined>(versions[0]);
-  const [comments, setComments] = useState<ImageComment[]>(demoImageComments[image.id] ?? []);
-  const [imageStatus, setImageStatus] = useState<ImageStatus>(image?.status ?? 'draft');
+  const [projectName, setProjectName] = useState('');
+  const [image, setImage] = useState<ProjectImageRecord | null>(null);
+  const [versions, setVersions] = useState<ImageVersionRecord[]>([]);
+  const [activeVersion, setActiveVersion] = useState<ImageVersionRecord | undefined>(undefined);
+  const [comments, setComments] = useState<ImageCommentRecord[]>([]);
+  const [imageStatus, setImageStatus] = useState<ImageStatus>('draft');
   const [fullscreen, setFullscreen] = useState(false);
   const [annotationsByVersion, setAnnotationsByVersion] = useState<Record<number, Annotation[]>>({});
   const [draft, setDraft] = useState<AnnotationDraft | null>(null);
   const [noteDraft, setNoteDraft] = useState('');
   const [showAnnotations, setShowAnnotations] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const [loading, setLoading] = useState(true);
 
   const annotations = annotationsByVersion[activeVersion?.version_number ?? 0] ?? [];
   const nextColor = COLORS[annotations.length % COLORS.length];
 
-  if (!image) {
+  const loadData = useCallback(async () => {
+    setLoading(true);
+    const res = await fetch(`/api/projects/${params.projectId}/images/${params.imageId}`);
+    if (res.status === 401) {
+      router.push('/login');
+      return;
+    }
+    const data = await res.json();
+    if (!res.ok) {
+      setError(data.error ?? 'Unable to load image');
+      setLoading(false);
+      return;
+    }
+    setProjectName(data.project?.name ?? '');
+    setImage(data.image);
+    const sorted = (data.versions ?? []).sort((a: ImageVersionRecord, b: ImageVersionRecord) => b.version_number - a.version_number);
+    setVersions(sorted);
+    setActiveVersion(sorted[0]);
+    setComments(data.comments ?? []);
+    setImageStatus(data.image?.status ?? 'draft');
+    setError(null);
+    setLoading(false);
+  }, [params.imageId, params.projectId, router]);
+
+  useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    loadData();
+  }, [loadData]);
+
+  const handleAddComment = async (body: string) => {
+    if (!activeVersion) return;
+    const res = await fetch(`/api/projects/${params.projectId}/images/${params.imageId}/comments`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ body, version_number: activeVersion.version_number }),
+    });
+    if (res.status === 401) {
+      router.push('/login');
+      return;
+    }
+    const data = await res.json();
+    if (!res.ok) {
+      setError(data.error ?? 'Unable to add comment');
+      return;
+    }
+    setComments((prev) => [...prev, data.comment]);
+  };
+
+  const updateStatus = async (status: ImageStatus) => {
+    const res = await fetch(`/api/projects/${params.projectId}/images/${params.imageId}`, {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ status }),
+    });
+    if (res.status === 401) {
+      router.push('/login');
+      return;
+    }
+    const data = await res.json();
+    if (!res.ok) {
+      setError(data.error ?? 'Unable to update status');
+      return;
+    }
+    setImageStatus(data.image.status);
+    setImage(data.image);
+  };
+
+  const handleApprove = () => updateStatus('approved');
+
+  const handleRequestRevision = () => {
+    updateStatus('needs_revision');
+    if (activeVersion) {
+      handleAddComment('Requesting revision on this version.');
+    }
+  };
+
+  const canApprove =
+    activeVersion && (activeVersion.status === 'delivered' || activeVersion.status === 'candidate');
+  const canRequestRevision = activeVersion && activeVersion.status !== 'approved';
+
+  if (loading) {
+    return (
+      <div className="mx-auto max-w-5xl space-y-4">
+        <div className="rounded-2xl border border-border-ghost bg-bg-paper p-6 text-sm text-text-subtle">
+          Loading image...
+        </div>
+      </div>
+    );
+  }
+
+  if (error || !image) {
     return (
       <div className="mx-auto max-w-4xl space-y-3">
         <button
@@ -367,42 +441,12 @@ export default function ImageDetailPage({ params }: { params: { projectId: strin
           <ArrowLeft className="h-4 w-4" />
           Back to project
         </button>
-        <div className="rounded-2xl border border-border-ghost bg-bg-paper p-6">
-          <p className="text-sm text-text-ink">Image not found.</p>
+        <div className="rounded-2xl border border-rose-100 bg-rose-50 p-6 text-sm text-rose-700">
+          {error ?? 'Image not found.'}
         </div>
       </div>
     );
   }
-
-  const handleAddComment = (body: string) => {
-    if (!activeVersion) return;
-    setComments((prev) => [
-      ...prev,
-      {
-        id: crypto.randomUUID(),
-        version_number: activeVersion.version_number,
-        author_type: 'customer',
-        author_name: 'You',
-        body,
-        created_at: new Date().toISOString(),
-      },
-    ]);
-  };
-
-  const handleApprove = () => {
-    setImageStatus('approved');
-  };
-
-  const handleRequestRevision = () => {
-    setImageStatus('needs_revision');
-    if (activeVersion) {
-      handleAddComment('Requesting revision on this version.');
-    }
-  };
-
-  const canApprove =
-    activeVersion && (activeVersion.status === 'delivered' || activeVersion.status === 'candidate');
-  const canRequestRevision = activeVersion && activeVersion.status !== 'approved';
 
   return (
     <div className="mx-auto max-w-5xl space-y-4">
@@ -422,7 +466,7 @@ export default function ImageDetailPage({ params }: { params: { projectId: strin
           <div>
             <p className="text-[11px] uppercase tracking-wide text-text-subtle">Image</p>
             <h1 className="text-xl font-semibold text-text-ink">{image.title}</h1>
-            <p className="text-sm text-text-subtle">Project: {demoProject.name}</p>
+            <p className="text-sm text-text-subtle">Project: {projectName || params.projectId}</p>
           </div>
           <div className="flex items-center gap-2 text-xs text-text-subtle">
             <span>Last updated {formatDateTime(image.updated_at)}</span>
@@ -433,6 +477,7 @@ export default function ImageDetailPage({ params }: { params: { projectId: strin
           <VersionSelector versions={versions} activeId={activeVersion?.id} onSelect={setActiveVersion} />
           <div className="flex flex-col gap-3">
             <ImageViewport
+              key={activeVersion?.id ?? 'no-version'}
               version={activeVersion}
               onDownload={() => activeVersion && window.open(activeVersion.output_url, '_blank')}
               onFullscreen={() => setFullscreen(true)}
@@ -478,15 +523,16 @@ export default function ImageDetailPage({ params }: { params: { projectId: strin
                             ...existing,
                             {
                               id: crypto.randomUUID(),
-                              tool: draft.tool,
-                              points: draft.points,
-                              note: noteDraft.trim(),
-                              version_number: activeVersion.version_number,
-                              color: nextColor,
-                            },
-                          ],
-                        };
-                      });
+                          tool: draft.tool,
+                          points: draft.points,
+                          note: noteDraft.trim(),
+                          version_number: activeVersion.version_number,
+                          color: nextColor,
+                          hidden: false,
+                        },
+                      ],
+                    };
+                  });
                       setDraft(null);
                       setNoteDraft('');
                     }}
@@ -518,14 +564,33 @@ export default function ImageDetailPage({ params }: { params: { projectId: strin
               ) : (
                 <div className="space-y-2">
                   {annotations.map((ann, idx) => (
-                    <div key={ann.id} className="flex items-start justify-between gap-2 rounded-lg border border-border-ghost bg-white px-3 py-2 text-sm">
+                    <div key={ann.id} className="flex items-start justify-between gap-3 rounded-lg border border-border-ghost bg-white px-3 py-2 text-sm">
                       <div className="flex flex-col gap-1">
                         <div className="flex items-center gap-2">
-                          <span className="h-2 w-2 rounded-full" style={{ backgroundColor: ann.color }} />
+                          <span className="h-2.5 w-2.5 rounded-full border border-border-ghost" style={{ backgroundColor: ann.color }} />
                           <span className="font-medium">#{idx + 1}</span>
+                          {ann.hidden && <span className="text-[11px] text-text-subtle">(hidden)</span>}
                         </div>
                         <span className="text-text-subtle/80">{ann.note}</span>
                       </div>
+                      <Button
+                        variant="ghost"
+                        className="px-2 py-1 text-xs text-text-subtle"
+                        onClick={() => {
+                          if (!activeVersion) return;
+                          setAnnotationsByVersion((prev) => {
+                            const existing = prev[activeVersion.version_number] ?? [];
+                            return {
+                              ...prev,
+                              [activeVersion.version_number]: existing.map((a) =>
+                                a.id === ann.id ? { ...a, hidden: !a.hidden } : a,
+                              ),
+                            };
+                          });
+                        }}
+                      >
+                        {ann.hidden ? 'Show' : 'Hide'}
+                      </Button>
                     </div>
                   ))}
                 </div>
