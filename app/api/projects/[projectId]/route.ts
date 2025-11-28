@@ -15,7 +15,7 @@ function respondDbError(message: string, error?: unknown, status = 500) {
   return NextResponse.json({ error: message, details }, { status });
 }
 
-export async function GET(_req: NextRequest, { params }: { params: { projectId: string } | Promise<{ projectId: string }> }) {
+export async function GET(_req: NextRequest, { params }: { params: Promise<{ projectId: string }> }) {
   const resolved = await params;
   const user = await getSessionUser();
   if (!user) return unauthorizedResponse();

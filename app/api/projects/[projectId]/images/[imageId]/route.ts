@@ -20,7 +20,7 @@ function isValidImageStatus(value: string | null | undefined): value is ImageSta
   return ['draft', 'processing', 'delivered', 'needs_revision', 'approved', 'archived'].includes(String(value));
 }
 
-export async function GET(_req: NextRequest, { params }: { params: { projectId: string; imageId: string } | Promise<{ projectId: string; imageId: string }> }) {
+export async function GET(_req: NextRequest, { params }: { params: Promise<{ projectId: string; imageId: string }> }) {
   const resolved = await params;
   const user = await getSessionUser();
   if (!user) return unauthorizedResponse();
@@ -65,7 +65,7 @@ export async function GET(_req: NextRequest, { params }: { params: { projectId: 
   });
 }
 
-export async function PATCH(req: NextRequest, { params }: { params: { projectId: string; imageId: string } | Promise<{ projectId: string; imageId: string }> }) {
+export async function PATCH(req: NextRequest, { params }: { params: Promise<{ projectId: string; imageId: string }> }) {
   const resolved = await params;
   const user = await getSessionUser(req);
   if (!user) return unauthorizedResponse();

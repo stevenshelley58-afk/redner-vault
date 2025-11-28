@@ -12,7 +12,7 @@ function respondDbError(message: string, error?: unknown, status = 500) {
   return NextResponse.json({ error: message, details }, { status });
 }
 
-export async function POST(req: NextRequest, { params }: { params: { projectId: string } | Promise<{ projectId: string }> }) {
+export async function POST(req: NextRequest, { params }: { params: Promise<{ projectId: string }> }) {
   const resolved = await params;
   const user = await getSessionUser(req);
   if (!user) return unauthorizedResponse();
@@ -32,7 +32,7 @@ export async function POST(req: NextRequest, { params }: { params: { projectId: 
     if (file instanceof File) {
       const bucket = await ensurePublicBucket('project-outputs');
       const safeName = file.name.replace(/\s+/g, '-');
-      const path = `${user.id}/${params.projectId}/${Date.now()}-${safeName}`;
+      const path = `${user.id}/${resolved.projectId}/${Date.now()}-${safeName}`;
       const arrayBuffer = await file.arrayBuffer();
       const { error: uploadError } = await bucket.upload(path, Buffer.from(arrayBuffer), {
         contentType: file.type || 'image/jpeg',

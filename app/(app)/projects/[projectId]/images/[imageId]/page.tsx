@@ -2,7 +2,7 @@
 
 export const dynamic = 'force-dynamic';
 
-import { useEffect, useMemo, useRef, useState, type MouseEvent, type TouchEvent } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState, type MouseEvent, type TouchEvent } from 'react';
 import { useRouter } from 'next/navigation';
 import { AlertTriangle, ArrowLeft, Check, Download, Maximize, MessageSquare, RotateCcw, Send, ZoomIn, ZoomOut } from 'lucide-react';
 import { StatusPill } from '../../../../../../components/app/StatusPill';

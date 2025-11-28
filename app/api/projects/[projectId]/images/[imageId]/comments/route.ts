@@ -10,7 +10,8 @@ function respondDbError(message: string, error?: unknown, status = 500) {
   return NextResponse.json({ error: message, details }, { status });
 }
 
-export async function POST(req: NextRequest, { params }: { params: { projectId: string; imageId: string } }) {
+export async function POST(req: NextRequest, { params }: { params: Promise<{ projectId: string; imageId: string }> }) {
+  const resolved = await params;
   const user = await getSessionUser(req);
   if (!user) return unauthorizedResponse();
 
@@ -23,13 +24,13 @@ export async function POST(req: NextRequest, { params }: { params: { projectId: 
   }
 
   const admin = createSupabaseServiceRoleClient();
-  const { data: projectCheck } = await admin.from('projects').select('id,user_id').eq('id', params.projectId).single();
+  const { data: projectCheck } = await admin.from('projects').select('id,user_id').eq('id', resolved.projectId).single();
   if (!projectCheck || projectCheck.user_id !== user.id) return unauthorizedResponse();
 
   const { data, error } = await admin
     .from('image_comments')
     .insert({
-      image_id: params.imageId,
+      image_id: resolved.imageId,
       version_number: versionNumber,
       author_type: 'customer',
       author_name: user.email ?? 'You',
