@@ -21,6 +21,14 @@ export function AppShell({ children }: AppShellProps) {
             </span>
           </Link>
           <div className="flex items-center gap-3">
+            <Link href="/login">
+              <Button
+                variant="ghost"
+                className="text-xs"
+              >
+                Login
+              </Button>
+            </Link>
             <Link href="/projects/new" className="hidden md:inline-flex">
               <Button
                 variant="secondary"
