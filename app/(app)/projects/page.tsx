@@ -2,7 +2,7 @@
 
 import { useEffect, useMemo, useState } from 'react';
 import type { ComponentType } from 'react';
-import { Calendar, Clock3, Image, Layers, Plus, Search, Sparkles } from 'lucide-react';
+import { Calendar, Image, Layers, Plus, Search, Sparkles } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import clsx from 'clsx';
 import { Button } from '../../../components/ui/Button';
@@ -266,7 +266,7 @@ export default function ProjectsPage() {
 
   return (
     <div className="space-y-6">
-      <section className="grid gap-4 lg:grid-cols-[2fr,1fr]">
+      <section className="grid gap-4">
         <div className="overflow-hidden rounded-[28px] bg-gradient-to-br from-[#4b6a8e] via-[#4f78a5] to-[#6bc6b5] text-white shadow-[0_18px_40px_rgba(79,120,165,0.28)]">
           <div className="flex flex-col gap-6 p-6">
             <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
@@ -305,58 +305,6 @@ export default function ProjectsPage() {
               <div className="inline-flex items-center gap-2 rounded-full bg-white/10 px-3 py-1.5 backdrop-blur">
                 <Image className="h-4 w-4" />
                 {stats.images} images delivered
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <div className="space-y-3">
-          <div className="rounded-[20px] border border-white/70 bg-white/95 p-4 shadow-[0_14px_32px_rgba(112,144,176,0.14)]">
-            <div className="flex items-start justify-between gap-2">
-              <div>
-                <p className="text-xs font-semibold uppercase tracking-wide text-[#7e8aa7]">Operations</p>
-                <p className="text-lg font-semibold text-[#1b2559]">Today&rsquo;s focus</p>
-                <p className="text-sm text-[#55607a]">Keep reviews moving and queue the next batch.</p>
-              </div>
-              <Badge variant="accent" className="bg-[#e8eef9] text-[#3f5f82] ring-1 ring-[#d8e3f5]">
-                Live
-              </Badge>
-            </div>
-            <div className="mt-4 space-y-2">
-              <div className="flex items-center justify-between rounded-[14px] bg-[#f5f7fb] px-3 py-2 text-sm text-[#3f4b68]">
-                <span>Awaiting your review</span>
-                <span className="text-base font-semibold text-[#1b2559]">{stats.awaiting}</span>
-              </div>
-              <div className="flex items-center justify-between rounded-[14px] bg-[#f5f7fb] px-3 py-2 text-sm text-[#3f4b68]">
-                <span>Drafts to scope</span>
-                <span className="text-base font-semibold text-[#1b2559]">{stats.drafts}</span>
-              </div>
-              <div className="flex items-center justify-between rounded-[14px] bg-[#f5f7fb] px-3 py-2 text-sm text-[#3f4b68]">
-                <span>Active production</span>
-                <span className="text-base font-semibold text-[#1b2559]">{stats.active}</span>
-              </div>
-            </div>
-            <Button
-              onClick={() => setFilter('active')}
-              variant="secondary"
-              className="mt-4 w-full rounded-full bg-[#1b2559] text-white shadow-[0_10px_28px_rgba(27,37,89,0.18)] hover:bg-[#162042]"
-            >
-              Jump to active
-            </Button>
-          </div>
-          <div className="rounded-[20px] border border-white/70 bg-gradient-to-br from-[#fef8ec] via-white to-[#f2f7ff] p-4 shadow-[0_14px_32px_rgba(112,144,176,0.1)]">
-            <div className="flex items-center gap-3">
-              <div className="flex h-10 w-10 items-center justify-center rounded-[12px] bg-white text-[#e5a300] shadow-sm ring-1 ring-white/70">
-                <Clock3 className="h-5 w-5" />
-              </div>
-              <div className="flex-1">
-                <p className="text-xs font-semibold uppercase tracking-wide text-[#a6780a]">Next milestone</p>
-                <p className="text-sm font-semibold text-[#1b2559]">
-                  {stats.nextDue ? stats.nextDue.name : 'All timelines clear'}
-                </p>
-                <p className="text-xs text-[#5c6680]">
-                  {stats.nextDue ? `Due ${formatDate(stats.nextDue.due_date ?? '')}` : 'Set a due date to track delivery.'}
-                </p>
               </div>
             </div>
           </div>

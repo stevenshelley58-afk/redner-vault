@@ -48,10 +48,6 @@ export default function PainContrast() {
 
                     {/* The Vault - Premium/Good */}
                     <div className="bg-white p-8 md:p-12 rounded-2xl shadow-xl border border-black/10 relative overflow-hidden group">
-                        <div className="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity">
-                            <Zap size={120} className="text-black" />
-                        </div>
-
                         <h2 className="text-xl font-medium text-black mb-8 flex items-center gap-2">
                             <span className="w-2 h-2 rounded-full bg-black animate-pulse"></span>
                             The Vault
