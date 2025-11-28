@@ -11,7 +11,8 @@ export default function UseCases() {
     return (
         <section className="py-24 px-6 md:px-0">
             <div className="max-w-[1200px] mx-auto w-full">
-                <h2 className="text-4xl font-medium text-text-ink mb-16 md:pl-[8.33%] tracking-tight">Ready for Everything</h2>
+                <h2 className="text-4xl font-medium text-text-ink mb-4 md:pl-[8.33%] tracking-tight">One stop shop business support</h2>
+                <p className="text-lg text-text-subtle mb-16 md:pl-[8.33%]">The Vault has a dedicated inhouse team to maximise your</p>
 
                 <div className="grid grid-cols-1 md:grid-cols-12 gap-4 auto-rows-[200px]">
                     {cases.map((item, i) => (

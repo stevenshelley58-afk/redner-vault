@@ -13,15 +13,15 @@ export default function Pricing() {
                         <div className="mb-8">
                             <h3 className="text-xl font-medium text-text-ink">Single Image</h3>
                             <div className="mt-4 flex items-baseline">
-                                <span className="text-4xl font-bold text-text-ink">$89</span>
-                                <span className="ml-2 text-text-subtle">Per image</span>
+                                <span className="text-4xl font-bold text-text-ink">$70</span>
+                                <span className="ml-2 text-text-subtle">per image</span>
                             </div>
                             <p className="text-sm text-text-subtle mt-4 leading-relaxed">
                                 Perfect for meta or social media posts
                             </p>
                         </div>
                         <ul className="space-y-4 mb-8 flex-1">
-                            {["1 images built from your product shots.", "Sized for ads, site, email, and PDP.", "Human art direction and QA on every batch.", "Commercial rights for your brand.", "Delivery in 1 business days after brief approval."].map((item) => (
+                            {["1 image built from your product shots.", "Sized for ads, site, email, and PDP.", "Human art direction and QA on every batch.", "Commercial rights for your brand.", "Delivery in 1 business day after brief approval."].map((item) => (
                                 <li key={item} className="flex gap-3 items-center text-sm text-text-ink">
                                     <Check size={16} className="text-accent shrink-0" />
                                     {item}
@@ -44,12 +44,11 @@ export default function Pricing() {
                                 <span className="text-4xl font-bold text-white">$980</span>
                             </div>
                             <p className="text-sm text-gray-400 mt-4 leading-relaxed">
-                                The AI photoshoot<br />
-                                One batch of hero images, done for you.
+                                The AI photoshoot / One batch of hero images, done for you.
                             </p>
                         </div>
                         <ul className="space-y-4 mb-8 flex-1">
-                            {["~20 final images built from your product shots.", "Sized for ads, site, email, and PDP.", "Human art direction and QA on every batch.", "Commercial rights for your brand.", "Delivery in 5 business days after brief approval."].map((item) => (
+                            {["20 images built from your product shots, scenes can vary across 20 images", "Sized for ads, site, email, and PDP.", "Human art direction and QA on every batch.", "Commercial rights for your brand.", "Delivery in 5 business days after brief approval."].map((item) => (
                                 <li key={item} className="flex gap-3 items-center text-sm text-white">
                                     <Check size={16} className="text-accent shrink-0" />
                                     {item}
@@ -66,7 +65,7 @@ export default function Pricing() {
                         <div className="mb-8">
                             <h3 className="text-xl font-medium text-text-ink">The Vault</h3>
                             <div className="mt-4 flex items-baseline">
-                                <span className="text-4xl font-bold text-text-ink">$200</span>
+                                <span className="text-4xl font-bold text-text-ink">$800</span>
                                 <span className="ml-2 text-text-subtle">/ month</span>
                             </div>
                             <p className="text-sm text-text-subtle mt-4 leading-relaxed">
@@ -74,7 +73,7 @@ export default function Pricing() {
                             </p>
                         </div>
                         <ul className="space-y-4 mb-8 flex-1">
-                            {["Unlimited Renders", "Prioritized Queue", "Dedicated Art Director", "Monthly Strategy Call", "Cancel Anytime"].map((item) => (
+                            {["Unlimited Renders", "Prioritised Queue", "Dedicated Art Director", "Monthly Strategy Call", "Cancel Anytime"].map((item) => (
                                 <li key={item} className="flex gap-3 items-center text-sm text-text-ink">
                                     <Check size={16} className="text-accent shrink-0" />
                                     {item}

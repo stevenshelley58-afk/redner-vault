@@ -33,7 +33,7 @@ export function BillingCreditsSection({ value }: BillingCreditsSectionProps) {
         <div className="space-y-1">
           <h2 className="text-sm font-medium text-text-ink">Plan & credits</h2>
           <p className="text-xs text-text-subtle">
-            Manage your subscription and see how your credits move with each job.
+            Manage your subscription and see credits.
           </p>
         </div>
       </div>
@@ -47,7 +47,7 @@ export function BillingCreditsSection({ value }: BillingCreditsSectionProps) {
             </Badge>
           </div>
           <p className="mt-2 text-[11px] text-text-subtle">
-            Billing is handled securely via Stripe. You can upgrade, pause, or cancel anytime from the customer portal.
+            Billing is handled via Stripe.
           </p>
         </div>
 

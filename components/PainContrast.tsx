@@ -6,11 +6,11 @@ export default function PainContrast() {
             <div className="max-w-[1200px] mx-auto w-full">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-16">
 
-                    {/* The Old Way - Desaturated/Bad */}
+                    {/* The Max Stress Way - Desaturated/Bad */}
                     <div className="bg-gray-100/50 p-8 md:p-12 rounded-2xl border border-gray-200/50">
                         <h2 className="text-xl font-medium text-text-subtle mb-8 flex items-center gap-2">
                             <span className="w-2 h-2 rounded-full bg-gray-400"></span>
-                            The Old Way
+                            The Max Stress Way
                         </h2>
 
                         <div className="space-y-8 opacity-60 grayscale transition-all duration-500 hover:grayscale-0 hover:opacity-100">
@@ -19,8 +19,8 @@ export default function PainContrast() {
                                     <Camera size={20} />
                                 </div>
                                 <div>
-                                    <h3 className="font-medium text-text-ink">5-10k on a photoshoot</h3>
-                                    <p className="text-sm text-text-subtle mt-1">Stressful & people let you down</p>
+                                    <h3 className="font-medium text-text-ink">Expensive photoshoots</h3>
+                                    <p className="text-sm text-text-subtle mt-1">Thousands spent & someone always lets you down</p>
                                 </div>
                             </div>
 
@@ -29,8 +29,8 @@ export default function PainContrast() {
                                     <Box size={20} />
                                 </div>
                                 <div>
-                                    <h3 className="font-medium text-text-ink">Limited editing options</h3>
-                                    <p className="text-sm text-text-subtle mt-1">Once its done, it’s done</p>
+                                    <h3 className="font-medium text-text-ink">No room for changes</h3>
+                                    <p className="text-sm text-text-subtle mt-1">If you don't like the shot, too late</p>
                                 </div>
                             </div>
 
@@ -40,17 +40,17 @@ export default function PainContrast() {
                                 </div>
                                 <div>
                                     <h3 className="font-medium text-text-ink">Slow turnaround</h3>
-                                    <p className="text-sm text-text-subtle mt-1">Time is money</p>
+                                    <p className="text-sm text-text-subtle mt-1">You want to launch yesterday</p>
                                 </div>
                             </div>
                         </div>
                     </div>
 
-                    {/* The Vault - Premium/Good */}
+                    {/* The Vault Way - Premium/Good */}
                     <div className="bg-white p-8 md:p-12 rounded-2xl shadow-xl border border-black/10 relative overflow-hidden group">
                         <h2 className="text-xl font-medium text-black mb-8 flex items-center gap-2">
                             <span className="w-2 h-2 rounded-full bg-black animate-pulse"></span>
-                            The Vault
+                            The Vault Way
                         </h2>
 
                         <div className="space-y-8 relative z-10">
@@ -69,8 +69,8 @@ export default function PainContrast() {
                                     <Zap size={20} />
                                 </div>
                                 <div>
-                                    <h3 className="font-medium text-text-ink">Post edits are easy</h3>
-                                    <p className="text-sm text-text-subtle mt-1">Change colours, positions & facial expressions</p>
+                                    <h3 className="font-medium text-text-ink">Edits made effortless</h3>
+                                    <p className="text-sm text-text-subtle mt-1">Edit colours, positions, even expressions</p>
                                 </div>
                             </div>
 

@@ -10,19 +10,19 @@ export default function FAQ() {
     const faqs = [
         {
             question: "How long does it take?",
-            answer: "Our standard turnaround time is 48 hours for the initial model and first batch of renders. Once the model is in our vault, new renders can be generated instantly."
+            answer: "Standard turnaround is 48 hours for the initial model and first batch. Once the model is in the vault, new renders can be generated instantly."
         },
         {
             question: "Do I need to ship my product?",
-            answer: "No. We only need a few reference photos taken from your phone to understand dimensions and textures. We build the digital twin from scratch."
+            answer: "No. We only need a few reference photos taken from your phone."
         },
         {
             question: "What if I don't like the renders?",
-            answer: "We offer unlimited revisions on the 3D model until it matches your product perfectly. For renders, we provide a satisfaction guarantee."
+            answer: "Unlimited revisions on the 3D model until correct. Satisfaction guarantee on renders."
         },
         {
             question: "Can you do complex animations?",
-            answer: "Yes. Since we build a full 3D asset, we can create anything from simple 360 spins to complex physics simulations and exploded views."
+            answer: "Yes. Full 3D asset enables anything from 360 spins to physics simulations."
         }
     ];
 

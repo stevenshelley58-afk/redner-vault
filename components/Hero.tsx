@@ -13,7 +13,7 @@ export default function Hero() {
                         No photographer
                     </h1>
                     <p className="text-lg md:text-xl text-text-subtle leading-relaxed max-w-md">
-                        Product images without stress
+                        Stand out images, zero stress
                     </p>
                 </div>
 

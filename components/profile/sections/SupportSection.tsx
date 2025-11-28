@@ -10,7 +10,7 @@ export function SupportSection({ userId, projectIdForDemo }: SupportSectionProps
   return (
     <div className="space-y-3 text-sm text-text-subtle">
       <p>
-        Need a hand with a brief, a scene, or a tricky material? Message us on Messenger and we&apos;ll walk through it with you.
+        Need a hand with a brief or scene? Message us on Messenger.
       </p>
       <a
         href={url}

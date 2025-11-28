@@ -39,9 +39,9 @@ const steps = [
     },
     {
         number: "2",
-        title: "We design and run the AI",
+        title: "We design and create the imagery",
         description:
-            "We handle concepts, scenes, and all the AI work. No tools for you to learn.",
+            "We handle concepts, scenes, and everything else. No tools for you to learn.",
         icon: (
             <svg
                 className="w-6 h-6"
@@ -60,7 +60,7 @@ const steps = [
     },
     {
         number: "3",
-        title: "You get 20+ hero images",
+        title: "You get a link to your inbox with images",
         description:
             "Sized for your chosen channels, ready to drop into ads, site, and email.",
         icon: (
@@ -103,7 +103,7 @@ export default function ProcessSection({ onOpenWizard }: ProcessSectionProps) {
                         How it works
                     </h2>
                     <p className="text-xl text-gray-500 max-w-md mx-auto font-medium">
-                        Three steps from brief to batch.
+                        Three steps from brief to creation.
                     </p>
                 </motion.div>
 

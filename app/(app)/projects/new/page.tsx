@@ -41,7 +41,7 @@ export default function NewProjectPage() {
         <div className="mb-4 space-y-1">
           <h1 className="text-2xl font-semibold tracking-tight text-text-ink">New project</h1>
           <p className="text-sm text-text-subtle">
-            Add a project type, a name (or let us auto-name it), a short brief, and an optional due date.
+            Add a project type, a name, a short brief, and an optional due date.
           </p>
         </div>
 
