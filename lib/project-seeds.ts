@@ -1,0 +1,53 @@
+import type { ProjectListItem } from './project-types';
+
+export const PROJECT_SEED: ProjectListItem[] = [
+  {
+    id: 'proj_001',
+    name: 'Teak Dining Collection',
+    project_type: 'image_render',
+    status: 'in_progress',
+    brief: 'Hero images for the new teak dining collection. Warm natural light, lifestyle props.',
+    due_date: '2024-12-05',
+    updated_at: '2024-11-27T16:45:00Z',
+    images_count: 6,
+    latest_version: 2,
+    billing_period_label: '2024-11',
+  },
+  {
+    id: 'proj_002',
+    name: 'Rajasthan Artisan Series',
+    project_type: 'image_render',
+    status: 'awaiting_client',
+    brief: 'Close-up craftsmanship shots with patina detail.',
+    due_date: '2024-12-01',
+    updated_at: '2024-11-26T14:20:00Z',
+    images_count: 12,
+    latest_version: 3,
+    billing_period_label: '2024-11',
+  },
+  {
+    id: 'proj_003',
+    name: 'Summer Campaign 2025',
+    project_type: 'image_render',
+    status: 'draft',
+    brief: '',
+    due_date: null,
+    updated_at: '2024-11-27T10:00:00Z',
+    images_count: 0,
+    latest_version: 0,
+    billing_period_label: '2024-11',
+  },
+  {
+    id: 'proj_004',
+    name: 'Outdoor Furniture Launch',
+    project_type: 'image_render',
+    status: 'completed',
+    brief: 'Launch imagery for new outdoor teak line. Poolside and garden settings.',
+    due_date: '2024-09-30',
+    updated_at: '2024-09-28T12:00:00Z',
+    images_count: 23,
+    latest_version: 4,
+    billing_period_label: '2024-09',
+  },
+];
+
