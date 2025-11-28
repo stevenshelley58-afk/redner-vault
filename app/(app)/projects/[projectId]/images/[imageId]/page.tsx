@@ -30,6 +30,14 @@ import {
 } from '../../../../../../lib/demo-data';
 import type { ImageStatus } from '../../../../../../lib/status';
 
+type Annotation = {
+  id: string;
+  x: number; // normalized 0-1
+  y: number; // normalized 0-1
+  note: string;
+  version_number: number;
+};
+
 function VersionSelector({
   versions,
   activeId,
@@ -63,10 +71,18 @@ function ImageViewport({
   version,
   onDownload,
   onFullscreen,
+  annotations,
+  onAddAnnotation,
+  isAnnotating,
+  setIsAnnotating,
 }: {
   version?: ImageVersion;
   onDownload: () => void;
   onFullscreen: () => void;
+  annotations: Annotation[];
+  onAddAnnotation: (x: number, y: number) => void;
+  isAnnotating: boolean;
+  setIsAnnotating: (v: boolean) => void;
 }) {
   const [zoom, setZoom] = useState(1);
   const [position, setPosition] = useState({ x: 0, y: 0 });
@@ -100,6 +116,15 @@ function ImageViewport({
   };
 
   const endDrag = () => setDragging(false);
+
+  const handleAnnotationClick = (e: MouseEvent<HTMLDivElement>) => {
+    if (!isAnnotating || !version) return;
+    const bounds = (e.currentTarget as HTMLDivElement).getBoundingClientRect();
+    const x = (e.clientX - bounds.left) / bounds.width;
+    const y = (e.clientY - bounds.top) / bounds.height;
+    onAddAnnotation(x, y);
+    setIsAnnotating(false);
+  };
 
   if (!version) {
     return (
@@ -152,6 +177,7 @@ function ImageViewport({
         onMouseMove={onMouseMove}
         onMouseUp={endDrag}
         onMouseLeave={endDrag}
+        onClick={handleAnnotationClick}
       >
         <img
           src={version.output_url}
@@ -163,6 +189,17 @@ function ImageViewport({
             transition: dragging ? 'none' : 'transform 80ms ease',
           }}
         />
+        {annotations.map((ann) => (
+          <div
+            key={ann.id}
+            className="absolute h-4 w-4 -translate-x-1/2 -translate-y-1/2 rounded-full border-2 border-white bg-accent shadow"
+            style={{ left: `${ann.x * 100}%`, top: `${ann.y * 100}%` }}
+            title={ann.note}
+          />
+        ))}
+        {isAnnotating && (
+          <div className="absolute inset-0 bg-accent/10 pointer-events-none" />
+        )}
       </div>
     </div>
   );
@@ -250,6 +287,10 @@ export default function ImageDetailPage({ params }: { params: { projectId: strin
   const [comments, setComments] = useState<ImageComment[]>(demoImageComments[image.id] ?? []);
   const [imageStatus, setImageStatus] = useState<ImageStatus>(image?.status ?? 'draft');
   const [fullscreen, setFullscreen] = useState(false);
+  const [annotationsByVersion, setAnnotationsByVersion] = useState<Record<number, Annotation[]>>({});
+  const [isAnnotating, setIsAnnotating] = useState(false);
+
+  const annotations = annotationsByVersion[activeVersion?.version_number ?? 0] ?? [];
 
   if (!image) {
     return (
@@ -330,6 +371,24 @@ export default function ImageDetailPage({ params }: { params: { projectId: strin
               version={activeVersion}
               onDownload={() => activeVersion && window.open(activeVersion.output_url, '_blank')}
               onFullscreen={() => setFullscreen(true)}
+              annotations={annotations}
+              onAddAnnotation={(x, y) => {
+                const note = window.prompt('Add a note for this annotation:');
+                if (!note) return;
+                if (!activeVersion) return;
+                setAnnotationsByVersion((prev) => {
+                  const existing = prev[activeVersion.version_number] ?? [];
+                  return {
+                    ...prev,
+                    [activeVersion.version_number]: [
+                      ...existing,
+                      { id: crypto.randomUUID(), x, y, note, version_number: activeVersion.version_number },
+                    ],
+                  };
+                });
+              }}
+              isAnnotating={isAnnotating}
+              setIsAnnotating={setIsAnnotating}
             />
             <CommentsPanel
               comments={comments}
@@ -355,17 +414,35 @@ export default function ImageDetailPage({ params }: { params: { projectId: strin
               )}
             </div>
           </div>
-          <div className="rounded-2xl border border-border-ghost bg-bg-paper px-4 py-3">
+          <div className="rounded-2xl border border-border-ghost bg-bg-paper px-4 py-3 space-y-3">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2 text-sm font-semibold text-text-ink">
                 <MessageSquare className="h-4 w-4 text-text-subtle" />
                 Annotations
               </div>
-              <span className="text-xs text-text-subtle">Coming soon</span>
+              <Button
+                variant={isAnnotating ? 'secondary' : 'ghost'}
+                className="px-3 py-1 text-xs"
+                onClick={() => setIsAnnotating((v) => !v)}
+              >
+                {isAnnotating ? 'Click image to place' : 'Add annotation'}
+              </Button>
             </div>
-            <p className="mt-2 text-sm text-text-subtle">
-              Inline pins and markup will live here. For now, use comments to leave feedback on this version.
-            </p>
+            {annotations.length === 0 ? (
+              <p className="text-sm text-text-subtle">No annotations yet. Click “Add annotation” then click on the image.</p>
+            ) : (
+              <div className="space-y-2">
+                {annotations.map((ann, idx) => (
+                  <div key={ann.id} className="flex items-center justify-between rounded-lg border border-border-ghost bg-white px-3 py-2 text-sm">
+                    <div className="flex items-center gap-2">
+                      <span className="h-2 w-2 rounded-full bg-accent" />
+                      <span className="font-medium">#{idx + 1}</span>
+                      <span className="text-text-subtle/80">{ann.note}</span>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
           </div>
         </div>
       </div>
