@@ -102,6 +102,7 @@ function ImageViewport({
   const [position, setPosition] = useState({ x: 0, y: 0 });
   const [dragging, setDragging] = useState(false);
   const dragStart = useRef({ x: 0, y: 0 });
+  const isDrawing = useRef(false);
 
   useEffect(() => {
     setZoom(1);
@@ -115,47 +116,72 @@ function ImageViewport({
     setPosition({ x: 0, y: 0 });
   };
 
+  const startDrawing = (clientX: number, clientY: number, target: HTMLDivElement) => {
+    if (!version) return;
+    if (tool === 'pen' || tool === 'arrow' || tool === 'circle') {
+      const bounds = target.getBoundingClientRect();
+      const x = (clientX - bounds.left) / bounds.width;
+      const y = (clientY - bounds.top) / bounds.height;
+      setDraft({ tool, points: [{ x, y }] });
+      isDrawing.current = true;
+    }
+  };
+
+  const continueDrawing = (clientX: number, clientY: number, target: HTMLDivElement) => {
+    if (dragging) {
+      setPosition({
+        x: clientX - dragStart.current.x,
+        y: clientY - dragStart.current.y,
+      });
+      return;
+    }
+    if (!isDrawing.current || !draft) return;
+    const bounds = target.getBoundingClientRect();
+    const x = (clientX - bounds.left) / bounds.width;
+    const y = (clientY - bounds.top) / bounds.height;
+    if (draft.tool === 'pen') {
+      setDraft({ ...draft, points: [...draft.points, { x, y }] });
+    } else {
+      setDraft({ ...draft, points: [draft.points[0], { x, y }] });
+    }
+  };
+
+  const stopDrawing = () => {
+    if (draft && isDrawing.current) {
+      onPlaceDraft();
+    }
+    isDrawing.current = false;
+    setDragging(false);
+  };
+
   const onMouseDown = (e: MouseEvent<HTMLDivElement>) => {
     if (tool === 'select' && zoom > 1) {
       setDragging(true);
       dragStart.current = { x: e.clientX - position.x, y: e.clientY - position.y };
       return;
     }
-    if (!version) return;
-    if (tool === 'pen' || tool === 'arrow' || tool === 'circle') {
-      const bounds = (e.currentTarget as HTMLDivElement).getBoundingClientRect();
-      const x = (e.clientX - bounds.left) / bounds.width;
-      const y = (e.clientY - bounds.top) / bounds.height;
-      setDraft({ tool, points: [{ x, y }] });
-    }
+    startDrawing(e.clientX, e.clientY, e.currentTarget);
   };
 
   const onMouseMove = (e: MouseEvent<HTMLDivElement>) => {
-    if (dragging) {
-      setPosition({
-        x: e.clientX - dragStart.current.x,
-        y: e.clientY - dragStart.current.y,
-      });
-      return;
-    }
-    if (draft) {
-      const bounds = (e.currentTarget as HTMLDivElement).getBoundingClientRect();
-      const x = (e.clientX - bounds.left) / bounds.width;
-      const y = (e.clientY - bounds.top) / bounds.height;
-      if (draft.tool === 'pen') {
-        setDraft({ ...draft, points: [...draft.points, { x, y }] });
-      } else {
-        setDraft({ ...draft, points: [draft.points[0], { x, y }] });
-      }
-    }
+    continueDrawing(e.clientX, e.clientY, e.currentTarget);
   };
 
-  const endDrag = () => {
-    if (draft) {
-      onPlaceDraft();
-    }
-    setDragging(false);
+  const onMouseUp = () => stopDrawing();
+
+  const onTouchStart = (e: React.TouchEvent<HTMLDivElement>) => {
+    const touch = e.touches[0];
+    if (!touch) return;
+    startDrawing(touch.clientX, touch.clientY, e.currentTarget);
   };
+
+  const onTouchMove = (e: React.TouchEvent<HTMLDivElement>) => {
+    const touch = e.touches[0];
+    if (!touch) return;
+    continueDrawing(touch.clientX, touch.clientY, e.currentTarget);
+  };
+
+  const onTouchEnd = () => stopDrawing();
 
   if (!version) {
     return (
@@ -250,8 +276,11 @@ function ImageViewport({
         className={`relative flex min-h-[320px] items-center justify-center overflow-hidden rounded-2xl border border-border-ghost bg-black ${zoom > 1 ? 'cursor-grab' : 'cursor-crosshair'}`}
         onMouseDown={onMouseDown}
         onMouseMove={onMouseMove}
-        onMouseUp={endDrag}
-        onMouseLeave={endDrag}
+        onMouseUp={onMouseUp}
+        onMouseLeave={stopDrawing}
+        onTouchStart={onTouchStart}
+        onTouchMove={onTouchMove}
+        onTouchEnd={onTouchEnd}
       >
         <img
           src={version.output_url}
