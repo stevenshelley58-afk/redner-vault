@@ -7,6 +7,7 @@ import { Input } from '../../../components/ui/Input';
 
 export default function LoginPage() {
   const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
   const [status, setStatus] = useState<'idle' | 'loading' | 'sent' | 'error'>('idle');
   const [message, setMessage] = useState('');
 
@@ -41,6 +42,33 @@ export default function LoginPage() {
     }
   };
 
+  const handlePasswordLogin = async () => {
+    setStatus('loading');
+    setMessage('');
+    try {
+      const supabase = createSupabaseBrowserClient();
+      const { error } = await supabase.auth.signInWithPassword({
+        email,
+        password,
+      });
+
+      if (error) {
+        setStatus('error');
+        setMessage(error.message);
+        return;
+      }
+
+      setStatus('idle');
+      setMessage('Signed in. Redirecting...');
+      if (typeof window !== 'undefined') {
+        window.location.href = '/projects';
+      }
+    } catch (err) {
+      setStatus('error');
+      setMessage('Something went wrong. Please try again.');
+    }
+  };
+
   const disabled = !email || status === 'loading' || status === 'sent';
 
   return (
@@ -61,6 +89,25 @@ export default function LoginPage() {
         />
         <Button onClick={handleMagicLink} disabled={disabled} className="w-full">
           {status === 'loading' ? 'Sending...' : 'Send magic link'}
+        </Button>
+        <div className="flex items-center gap-2 text-xs text-text-subtle/80">
+          <span className="h-px flex-1 bg-border-ghost" />
+          <span>or</span>
+          <span className="h-px flex-1 bg-border-ghost" />
+        </div>
+        <Input
+          type="password"
+          placeholder="Password (dev/testing)"
+          value={password}
+          onChange={(e) => setPassword(e.target.value)}
+        />
+        <Button
+          onClick={handlePasswordLogin}
+          disabled={!email || !password || status === 'loading'}
+          className="w-full"
+          variant="secondary"
+        >
+          {status === 'loading' ? 'Signing in...' : 'Login with password'}
         </Button>
         {message && (
           <p className={`text-sm ${status === 'error' ? 'text-red-600' : 'text-text-subtle'}`}>{message}</p>
