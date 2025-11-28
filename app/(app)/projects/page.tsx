@@ -2,10 +2,11 @@
 
 import { useEffect, useMemo, useState } from 'react';
 import type { ComponentType } from 'react';
-import { Calendar, Image, Layers, Plus, Search } from 'lucide-react';
+import { Calendar, Clock3, Image, Layers, Plus, Search, Sparkles } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import clsx from 'clsx';
 import { Button } from '../../../components/ui/Button';
+import { Badge } from '../../../components/ui/Badge';
 import { Input } from '../../../components/ui/Input';
 import { StatusPill } from '../../../components/app/StatusPill';
 import { NewProjectForm } from '../../../components/app/NewProjectForm';
@@ -18,9 +19,9 @@ import type { ProjectStatus } from '../../../lib/status';
 type FilterKey = 'all' | 'active' | 'draft' | 'completed';
 
 const PROJECT_TYPES: Record<ProjectType, { label: string; badge: string; icon: ComponentType<{ className?: string }> }> = {
-  image_render: { label: 'Image render', badge: 'bg-blue-50 text-blue-700', icon: Image },
-  website_build: { label: 'Website build', badge: 'bg-indigo-50 text-indigo-700', icon: Layers },
-  other: { label: 'Other', badge: 'bg-slate-100 text-slate-700', icon: Layers },
+  image_render: { label: 'Image render', badge: 'bg-[#e8eef9] text-[#3f5f82] border border-white/80', icon: Image },
+  website_build: { label: 'Website build', badge: 'bg-[#e9e7ff] text-[#4d3fb3] border border-white/80', icon: Layers },
+  other: { label: 'Other', badge: 'bg-[#eef2f6] text-[#445168] border border-white/80', icon: Layers },
 };
 
 const FILTERS: { key: FilterKey; label: string; statuses?: ProjectStatus[] }[] = [
@@ -46,14 +47,14 @@ function FilterTabs({
           key={filter.key}
           onClick={() => onChange(filter.key)}
           className={clsx(
-            'inline-flex items-center gap-2 rounded-full px-3 py-1.5 text-sm transition',
-            'border border-border-ghost text-text-subtle hover:bg-surface',
-            active === filter.key && 'border-accent/30 bg-accent/10 text-accent',
+            'inline-flex items-center gap-2 rounded-full px-3.5 py-1.5 text-sm transition',
+            'border border-white/70 bg-white/80 text-[#5b6680] shadow-[0_10px_24px_rgba(112,144,176,0.08)] hover:-translate-y-0.5 hover:shadow-[0_12px_26px_rgba(112,144,176,0.12)]',
+            active === filter.key && 'border-[#d4e0f0] bg-[#e8eef9] text-[#1b2559]',
           )}
         >
           {filter.label}
           {counts[filter.key] > 0 && (
-            <span className="rounded-full bg-white/80 px-2 py-0.5 text-[11px] font-semibold text-text-subtle">
+            <span className="rounded-full border border-white/70 bg-[#f5f7fb] px-2 py-0.5 text-[11px] font-semibold text-[#3f4b68]">
               {counts[filter.key]}
             </span>
           )}
@@ -70,48 +71,48 @@ function ProjectCard({ project }: { project: ProjectListItem }) {
   return (
     <button
       onClick={() => router.push(`/projects/${project.id}`)}
-      className="group relative flex w-full flex-col gap-3 rounded-2xl border border-border-ghost bg-surface/60 p-4 text-left shadow-sm transition hover:-translate-y-0.5 hover:shadow-md"
+      className="group relative flex w-full flex-col gap-3 overflow-hidden rounded-[20px] border border-white/70 bg-white/95 p-5 text-left shadow-[0_18px_40px_rgba(112,144,176,0.12)] transition hover:-translate-y-1 hover:shadow-[0_24px_52px_rgba(112,144,176,0.18)]"
     >
       <div className="flex items-start gap-3">
         <div
           className={clsx(
-            'flex h-10 w-10 items-center justify-center rounded-xl text-sm font-semibold shadow-sm',
-            typeConfig?.badge ?? 'bg-slate-100 text-slate-700',
+            'flex h-11 w-11 items-center justify-center rounded-[14px] text-sm font-semibold shadow-[0_10px_24px_rgba(112,144,176,0.12)] ring-1 ring-white/70',
+            typeConfig?.badge ?? 'bg-[#eef2f6] text-[#445168] border border-white/80',
           )}
         >
           {typeConfig?.icon ? <typeConfig.icon className="h-5 w-5" /> : <Image className="h-5 w-5" />}
         </div>
         <div className="flex flex-1 flex-col gap-1">
           <div className="flex items-center gap-2">
-            <span className="text-xs font-semibold uppercase tracking-wide text-text-subtle">
+            <span className="text-xs font-semibold uppercase tracking-wide text-[#7e8aa7]">
               {typeConfig?.label ?? 'Project'}
             </span>
-            <span className="text-[11px] text-text-subtle/70">{project.billing_period_label}</span>
+            <span className="text-[11px] text-[#9aa5bf]">{project.billing_period_label}</span>
           </div>
           <div className="flex items-center gap-2">
-            <h3 className="text-lg font-semibold leading-tight text-text-ink">{project.name}</h3>
+            <h3 className="text-lg font-semibold leading-tight text-[#1b2559]">{project.name}</h3>
             <StatusPill kind="project" status={project.status} />
           </div>
           {project.brief ? (
-            <p className="line-clamp-2 text-sm text-text-subtle">{project.brief}</p>
+            <p className="line-clamp-2 text-sm text-[#55607a]">{project.brief}</p>
           ) : (
-            <p className="text-sm text-text-subtle/70">No brief yet.</p>
+            <p className="text-sm text-[#9aa5bf]">No brief yet.</p>
           )}
         </div>
       </div>
 
-      <div className="flex items-center justify-between text-xs text-text-subtle">
+      <div className="flex items-center justify-between text-xs text-[#5b6680]">
         <div className="flex items-center gap-4">
-          <div className="inline-flex items-center gap-1 rounded-full bg-white/80 px-2 py-1 text-xs">
-            <Image className="h-3.5 w-3.5 text-text-subtle/80" />
+          <div className="inline-flex items-center gap-1 rounded-full border border-white/70 bg-[#f5f7fb] px-2 py-1 text-xs shadow-sm">
+            <Image className="h-3.5 w-3.5 text-[#7e8aa7]" />
             {project.images_count} images
           </div>
-          <div className="inline-flex items-center gap-1 rounded-full bg-white/80 px-2 py-1 text-xs">
-            <Layers className="h-3.5 w-3.5 text-text-subtle/80" />
+          <div className="inline-flex items-center gap-1 rounded-full border border-white/70 bg-[#f5f7fb] px-2 py-1 text-xs shadow-sm">
+            <Layers className="h-3.5 w-3.5 text-[#7e8aa7]" />
             v{project.latest_version || 1}
           </div>
         </div>
-        <span className="text-[11px] uppercase tracking-wide text-text-subtle/80">
+        <span className="text-[11px] uppercase tracking-wide text-[#9aa5bf]">
           Updated {formatRelativeTime(project.updated_at)}
         </span>
       </div>
@@ -120,15 +121,15 @@ function ProjectCard({ project }: { project: ProjectListItem }) {
         <div
           className={clsx(
             'inline-flex items-center gap-2 self-start rounded-xl px-3 py-1.5 text-xs font-medium',
-            'border border-border-ghost bg-white/80 text-text-subtle',
+            'border border-white/70 bg-[#f5f7fb] text-[#3f4b68] shadow-sm',
           )}
         >
-          <Calendar className="h-4 w-4 text-text-subtle/70" />
+          <Calendar className="h-4 w-4 text-[#7e8aa7]" />
           Due {formatDate(project.due_date)}
         </div>
       )}
 
-      <span className="absolute right-4 top-4 text-[10px] uppercase tracking-wide text-text-subtle/70 transition group-hover:text-text-subtle">
+      <span className="absolute right-4 top-4 text-[10px] uppercase tracking-wide text-[#9aa5bf] transition group-hover:text-[#5b6680]">
         Open
       </span>
     </button>
@@ -137,15 +138,19 @@ function ProjectCard({ project }: { project: ProjectListItem }) {
 
 function EmptyState({ onCreate }: { onCreate: () => void }) {
   return (
-    <div className="flex flex-col items-center justify-center rounded-2xl border border-dashed border-border-ghost bg-surface/40 px-6 py-12 text-center">
-      <div className="mb-3 flex h-12 w-12 items-center justify-center rounded-full bg-surface shadow-sm">
-        <Image className="h-5 w-5 text-text-subtle" />
+    <div className="flex flex-col items-center justify-center rounded-[22px] border border-dashed border-[#d4e0f0] bg-white/90 px-8 py-12 text-center shadow-[0_14px_32px_rgba(112,144,176,0.12)]">
+      <div className="mb-3 flex h-12 w-12 items-center justify-center rounded-full bg-[#f5f7fb] text-[#4f78a5] shadow-inner">
+        <Image className="h-5 w-5" />
       </div>
-      <h3 className="text-lg font-semibold text-text-ink">No projects yet</h3>
-      <p className="mt-2 max-w-sm text-sm text-text-subtle">
+      <h3 className="text-lg font-semibold text-[#1b2559]">No projects yet</h3>
+      <p className="mt-2 max-w-sm text-sm text-[#55607a]">
         Create your first project to share a brief, upload references, and review renders in one place.
       </p>
-      <Button onClick={onCreate} className="mt-4" iconLeft={<Plus className="h-4 w-4" />}>
+      <Button
+        onClick={onCreate}
+        className="mt-4 rounded-full shadow-[0_10px_24px_rgba(112,144,176,0.14)]"
+        iconLeft={<Plus className="h-4 w-4" />}
+      >
         New project
       </Button>
     </div>
@@ -164,16 +169,16 @@ function NewProjectSheet({
   if (!open) return null;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-end justify-center bg-black/40 px-4 py-6 backdrop-blur-sm md:items-center">
-      <div className="w-full max-w-xl rounded-2xl border border-border-ghost bg-bg-paper p-5 shadow-2xl">
+    <div className="fixed inset-0 z-50 flex items-end justify-center bg-[#0f172a]/30 px-4 py-6 backdrop-blur-md md:items-center">
+      <div className="w-full max-w-xl rounded-[22px] border border-white/80 bg-white/95 p-5 shadow-[0_28px_70px_rgba(112,144,176,0.25)]">
         <div className="flex items-start justify-between gap-3">
           <div>
-            <h3 className="text-lg font-semibold text-text-ink">New project</h3>
-            <p className="text-sm text-text-subtle">Add a brief and optional due date to kick things off.</p>
+            <h3 className="text-lg font-semibold text-[#1b2559]">New project</h3>
+            <p className="text-sm text-[#55607a]">Add a brief and optional due date to kick things off.</p>
           </div>
           <button
             onClick={onClose}
-            className="rounded-full border border-border-ghost bg-surface px-2 py-1 text-xs text-text-subtle hover:bg-surface/70"
+            className="rounded-full border border-white/70 bg-[#f5f7fb] px-3 py-1 text-xs font-semibold text-[#5b6680] transition hover:bg-white"
           >
             Close
           </button>
@@ -234,35 +239,163 @@ export default function ProjectsPage() {
       .sort((a, b) => new Date(b.updated_at).getTime() - new Date(a.updated_at).getTime());
   }, [projects, filter, search]);
 
-  return (
-    <div className="mx-auto max-w-4xl space-y-4">
-      <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
-        <div>
-          <h1 className="text-2xl font-semibold tracking-tight text-text-ink">Projects</h1>
-          <p className="text-sm text-text-subtle">Filter, search, and create projects.</p>
-        </div>
-        <Button onClick={() => setSheetOpen(true)} iconLeft={<Plus className="h-4 w-4" />}>
-          New project
-        </Button>
-      </div>
+  const stats = useMemo(() => {
+    const activeStatuses: ProjectStatus[] = ['in_review', 'in_progress'];
+    const awaitingStatuses: ProjectStatus[] = ['awaiting_client'];
+    const now = Date.now();
 
-      <div className="space-y-3 rounded-2xl border border-border-ghost bg-bg-paper p-4 shadow-sm">
-        <div className="relative">
-          <Search className="pointer-events-none absolute left-3 top-2.5 h-4 w-4 text-text-subtle/70" />
-          <Input
-            placeholder="Search by name or brief..."
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-            className="pl-10"
-          />
+    const withDue = projects
+      .filter((p) => p.due_date)
+      .map((p) => ({ ...p, due: new Date(p.due_date as string) }))
+      .filter((p) => !Number.isNaN(p.due.getTime()));
+
+    const nextDue = withDue
+      .filter((p) => p.due.getTime() >= now - 24 * 60 * 60 * 1000)
+      .sort((a, b) => a.due.getTime() - b.due.getTime())[0];
+
+    return {
+      total: projects.length,
+      active: projects.filter((p) => activeStatuses.includes(p.status)).length,
+      awaiting: projects.filter((p) => awaitingStatuses.includes(p.status)).length,
+      drafts: projects.filter((p) => p.status === 'draft').length,
+      completed: projects.filter((p) => p.status === 'completed').length,
+      images: projects.reduce((sum, p) => sum + (p.images_count || 0), 0),
+      nextDue,
+    };
+  }, [projects]);
+
+  return (
+    <div className="space-y-6">
+      <section className="grid gap-4 lg:grid-cols-[2fr,1fr]">
+        <div className="overflow-hidden rounded-[28px] bg-gradient-to-br from-[#4b6a8e] via-[#4f78a5] to-[#6bc6b5] text-white shadow-[0_18px_40px_rgba(79,120,165,0.28)]">
+          <div className="flex flex-col gap-6 p-6">
+            <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+              <div>
+                <p className="text-sm text-white/70">Workspace overview</p>
+                <h1 className="text-3xl font-semibold leading-tight">Projects</h1>
+                <p className="text-sm text-white/80">Briefs, deliverables, and output reviews in one vault.</p>
+              </div>
+              <div className="inline-flex items-center gap-2 rounded-full bg-white/10 px-3 py-1.5 text-sm font-semibold shadow-inner backdrop-blur">
+                <Sparkles className="h-4 w-4" />
+                Queue steady
+              </div>
+            </div>
+
+            <div className="grid gap-3 sm:grid-cols-3">
+              {[
+                { label: 'Active projects', value: stats.active },
+                { label: 'Awaiting your review', value: stats.awaiting },
+                { label: 'Completed', value: stats.completed },
+              ].map((item) => (
+                <div
+                  key={item.label}
+                  className="rounded-2xl bg-white/10 p-4 shadow-[0_10px_24px_rgba(0,0,0,0.12)] backdrop-blur"
+                >
+                  <p className="text-sm text-white/75">{item.label}</p>
+                  <p className="text-3xl font-semibold leading-tight">{item.value}</p>
+                </div>
+              ))}
+            </div>
+
+            <div className="flex flex-wrap gap-3 text-sm text-white/85">
+              <div className="inline-flex items-center gap-2 rounded-full bg-white/10 px-3 py-1.5 backdrop-blur">
+                <Calendar className="h-4 w-4" />
+                {stats.nextDue ? `Next due: ${formatDate(stats.nextDue.due_date ?? '')}` : 'No due dates set'}
+              </div>
+              <div className="inline-flex items-center gap-2 rounded-full bg-white/10 px-3 py-1.5 backdrop-blur">
+                <Image className="h-4 w-4" />
+                {stats.images} images delivered
+              </div>
+            </div>
+          </div>
         </div>
-        <FilterTabs active={filter} onChange={setFilter} counts={counts} />
-      </div>
+
+        <div className="space-y-3">
+          <div className="rounded-[20px] border border-white/70 bg-white/95 p-4 shadow-[0_14px_32px_rgba(112,144,176,0.14)]">
+            <div className="flex items-start justify-between gap-2">
+              <div>
+                <p className="text-xs font-semibold uppercase tracking-wide text-[#7e8aa7]">Operations</p>
+                <p className="text-lg font-semibold text-[#1b2559]">Today&rsquo;s focus</p>
+                <p className="text-sm text-[#55607a]">Keep reviews moving and queue the next batch.</p>
+              </div>
+              <Badge variant="accent" className="bg-[#e8eef9] text-[#3f5f82] ring-1 ring-[#d8e3f5]">
+                Live
+              </Badge>
+            </div>
+            <div className="mt-4 space-y-2">
+              <div className="flex items-center justify-between rounded-[14px] bg-[#f5f7fb] px-3 py-2 text-sm text-[#3f4b68]">
+                <span>Awaiting your review</span>
+                <span className="text-base font-semibold text-[#1b2559]">{stats.awaiting}</span>
+              </div>
+              <div className="flex items-center justify-between rounded-[14px] bg-[#f5f7fb] px-3 py-2 text-sm text-[#3f4b68]">
+                <span>Drafts to scope</span>
+                <span className="text-base font-semibold text-[#1b2559]">{stats.drafts}</span>
+              </div>
+              <div className="flex items-center justify-between rounded-[14px] bg-[#f5f7fb] px-3 py-2 text-sm text-[#3f4b68]">
+                <span>Active production</span>
+                <span className="text-base font-semibold text-[#1b2559]">{stats.active}</span>
+              </div>
+            </div>
+            <Button
+              onClick={() => setFilter('active')}
+              variant="secondary"
+              className="mt-4 w-full rounded-full bg-[#1b2559] text-white shadow-[0_10px_28px_rgba(27,37,89,0.18)] hover:bg-[#162042]"
+            >
+              Jump to active
+            </Button>
+          </div>
+          <div className="rounded-[20px] border border-white/70 bg-gradient-to-br from-[#fef8ec] via-white to-[#f2f7ff] p-4 shadow-[0_14px_32px_rgba(112,144,176,0.1)]">
+            <div className="flex items-center gap-3">
+              <div className="flex h-10 w-10 items-center justify-center rounded-[12px] bg-white text-[#e5a300] shadow-sm ring-1 ring-white/70">
+                <Clock3 className="h-5 w-5" />
+              </div>
+              <div className="flex-1">
+                <p className="text-xs font-semibold uppercase tracking-wide text-[#a6780a]">Next milestone</p>
+                <p className="text-sm font-semibold text-[#1b2559]">
+                  {stats.nextDue ? stats.nextDue.name : 'All timelines clear'}
+                </p>
+                <p className="text-xs text-[#5c6680]">
+                  {stats.nextDue ? `Due ${formatDate(stats.nextDue.due_date ?? '')}` : 'Set a due date to track delivery.'}
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section className="rounded-[20px] border border-white/70 bg-white/95 p-4 shadow-[0_14px_32px_rgba(112,144,176,0.12)]">
+        <div className="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
+          <div className="relative w-full lg:max-w-xl">
+            <Search className="pointer-events-none absolute left-3 top-2.5 h-4 w-4 text-[#9aa5bf]" />
+            <Input
+              placeholder="Search by name or brief..."
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+              className="rounded-full border-white/80 bg-[#f5f7fb] pl-10 text-[#1b2559] shadow-inner placeholder:text-[#9aa5bf] focus-visible:ring-[#4f78a5] focus-visible:ring-offset-0"
+            />
+          </div>
+          <div className="flex flex-wrap items-center gap-2">
+            <Badge className="bg-[#f5f7fb] text-[#3f4b68] ring-1 ring-white/70">
+              Showing {filtered.length} of {projects.length}
+            </Badge>
+            <Button
+              onClick={() => setSheetOpen(true)}
+              iconLeft={<Plus className="h-4 w-4" />}
+              className="rounded-full bg-[#4f78a5] text-white shadow-[0_12px_28px_rgba(79,120,165,0.24)] hover:bg-[#486f98]"
+            >
+              New project
+            </Button>
+          </div>
+        </div>
+        <div className="mt-3">
+          <FilterTabs active={filter} onChange={setFilter} counts={counts} />
+        </div>
+      </section>
 
       {filtered.length === 0 ? (
         <EmptyState onCreate={() => setSheetOpen(true)} />
       ) : (
-        <div className="grid grid-cols-1 gap-3 md:grid-cols-2">
+        <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
           {filtered.map((project) => (
             <ProjectCard key={project.id} project={project} />
           ))}
