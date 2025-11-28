@@ -39,7 +39,7 @@ export async function GET(req: NextRequest) {
   const q = searchParams.get('q');
   const statusParam = searchParams.get('status');
 
-  let query = admin.from('projects').select<ProjectRecord>('*').eq('user_id', user.id);
+  let query = admin.from('projects').select('*').eq('user_id', user.id);
   if (q) {
     query = query.or(`name.ilike.%${q}%,brief.ilike.%${q}%`);
   }

@@ -29,14 +29,14 @@ export async function GET(_req: NextRequest, { params }: { params: Promise<{ pro
 
   const { data: image, error: imageError } = await admin
     .from('project_images')
-    .select<ProjectImageRecord>('*')
+    .select('*')
     .eq('id', resolved.imageId)
     .single();
   if (imageError) return respondDbError('Image not found or database missing.', imageError, 404);
 
   const { data: project, error: projectError } = await admin
     .from('projects')
-    .select<ProjectRecord>('id, name, user_id')
+    .select('id, name, user_id')
     .eq('id', image.project_id)
     .single();
   if (projectError || !project || project.user_id !== user.id) return unauthorizedResponse();
@@ -44,12 +44,12 @@ export async function GET(_req: NextRequest, { params }: { params: Promise<{ pro
   const [versionsRes, commentsRes] = await Promise.all([
     admin
       .from('image_versions')
-      .select<ImageVersionRecord>('*')
+      .select('*')
     .eq('image_id', resolved.imageId)
       .order('version_number', { ascending: false }),
     admin
       .from('image_comments')
-      .select<ImageCommentRecord>('*')
+      .select('*')
     .eq('image_id', resolved.imageId)
       .order('created_at', { ascending: true }),
   ]);
@@ -67,7 +67,7 @@ export async function GET(_req: NextRequest, { params }: { params: Promise<{ pro
 
 export async function PATCH(req: NextRequest, { params }: { params: Promise<{ projectId: string; imageId: string }> }) {
   const resolved = await params;
-  const user = await getSessionUser(req);
+  const user = await getSessionUser();
   if (!user) return unauthorizedResponse();
 
   const payload = await req.json().catch(() => null);
@@ -84,7 +84,7 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ pr
     .from('project_images')
     .update({ status, updated_at: new Date().toISOString() })
     .eq('id', resolved.imageId)
-    .select<ProjectImageRecord>()
+    .select()
     .single();
 
   if (error) return respondDbError('Failed to update image status.', error);

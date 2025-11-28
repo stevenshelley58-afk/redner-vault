@@ -12,7 +12,7 @@ function respondDbError(message: string, error?: unknown, status = 500) {
 
 export async function POST(req: NextRequest, { params }: { params: Promise<{ projectId: string; imageId: string }> }) {
   const resolved = await params;
-  const user = await getSessionUser(req);
+  const user = await getSessionUser();
   if (!user) return unauthorizedResponse();
 
   const payload = await req.json().catch(() => null);
@@ -36,7 +36,7 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ pro
       author_name: user.email ?? 'You',
       body,
     })
-    .select<ImageCommentRecord>()
+    .select()
     .single();
 
   if (error) return respondDbError('Failed to add comment.', error);

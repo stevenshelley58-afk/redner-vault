@@ -45,7 +45,7 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ pro
     file_thumbnail_url: publicUrl,
   };
 
-  const { data, error } = await admin.from('project_assets').insert(insertPayload).select<ProjectAssetRecord>().single();
+  const { data, error } = await admin.from('project_assets').insert(insertPayload).select().single();
   if (error) return respondDbError('Failed to record asset in database.', error);
 
   await admin.from('projects').update({ updated_at: new Date().toISOString() }).eq('id', projectId);

@@ -14,7 +14,7 @@ function respondDbError(message: string, error?: unknown, status = 500) {
 
 export async function POST(req: NextRequest, { params }: { params: Promise<{ projectId: string }> }) {
   const resolved = await params;
-  const user = await getSessionUser(req);
+  const user = await getSessionUser();
   if (!user) return unauthorizedResponse();
 
   const contentType = req.headers.get('content-type') || '';
@@ -74,7 +74,7 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ pro
       latest_version: 1,
       updated_at: now,
     })
-    .select<ProjectImageRecord>()
+    .select()
     .single();
 
   if (imageError) return respondDbError('Failed to create image record.', imageError);
@@ -90,7 +90,7 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ pro
       created_by_name: user.email ?? 'You',
       created_at: now,
     })
-    .select<ImageVersionRecord>()
+    .select()
     .single();
 
   if (versionError) return respondDbError('Failed to create initial version.', versionError);

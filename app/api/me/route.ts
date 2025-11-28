@@ -31,7 +31,7 @@ export async function GET(req: NextRequest) {
 
   const { data: profileRow, error: profileError } = await admin
     .from('profiles')
-    .select<ProfileRecord>('*')
+    .select('*')
     .eq('id', user.id)
     .maybeSingle();
 
@@ -52,7 +52,7 @@ export async function GET(req: NextRequest) {
       role: 'customer',
       member_id: generateMemberId(),
     };
-    const { data, error } = await admin.from('profiles').insert(insertPayload).select<ProfileRecord>().single();
+    const { data, error } = await admin.from('profiles').insert(insertPayload).select().single();
     if (error) return respondDbError('Failed to create profile record.', error);
     profile = data;
   }
@@ -69,7 +69,7 @@ export async function GET(req: NextRequest) {
 
   const { data: brandRow, error: brandError } = await admin
     .from('brands')
-    .select<BrandRecord>('*')
+    .select('*')
     .eq('user_id', user.id)
     .maybeSingle();
   if (brandError && brandError.code !== 'PGRST116') return respondDbError('Failed to load brand.', brandError);
@@ -93,7 +93,7 @@ export async function GET(req: NextRequest) {
 
   const { data: billingRow, error: billingError } = await admin
     .from('billing_accounts')
-    .select<BillingAccountRecord>('*')
+    .select('*')
     .eq('user_id', user.id)
     .maybeSingle();
   if (billingError && billingError.code !== 'PGRST116') return respondDbError('Failed to load billing.', billingError);
@@ -103,7 +103,7 @@ export async function GET(req: NextRequest) {
     const { data, error } = await admin
       .from('billing_accounts')
       .insert({ user_id: user.id, plan: null, credits_balance: 0 })
-      .select<BillingAccountRecord>()
+      .select()
       .single();
     if (error) return respondDbError('Failed to create billing account.', error);
     billing = data;
@@ -111,7 +111,7 @@ export async function GET(req: NextRequest) {
 
   const { data: transactions, error: txError } = await admin
     .from('billing_transactions')
-    .select<BillingTransactionRecord>('*')
+    .select('*')
     .eq('billing_account_id', billing.id)
     .order('created_at', { ascending: false })
     .limit(20);
@@ -119,7 +119,7 @@ export async function GET(req: NextRequest) {
 
   const { data: projects, error: projectsError } = await admin
     .from('projects')
-    .select<ProjectRecord>('id,status,images_count,updated_at')
+    .select('id,status,images_count,updated_at')
     .eq('user_id', user.id);
   if (projectsError) return respondDbError('Failed to load usage.', projectsError);
 

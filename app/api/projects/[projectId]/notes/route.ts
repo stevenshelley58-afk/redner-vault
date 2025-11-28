@@ -12,7 +12,7 @@ function respondDbError(message: string, error?: unknown, status = 500) {
 
 export async function POST(req: NextRequest, { params }: { params: Promise<{ projectId: string }> }) {
   const resolved = await params;
-  const user = await getSessionUser(req);
+  const user = await getSessionUser();
   if (!user) return unauthorizedResponse();
 
   const payload = await req.json().catch(() => null);
@@ -27,7 +27,7 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ pro
     body,
   };
 
-  const { data, error } = await admin.from('project_notes').insert(insertPayload).select<ProjectNoteRecord>().single();
+  const { data, error } = await admin.from('project_notes').insert(insertPayload).select().single();
   if (error) return respondDbError('Failed to add note. Ensure the database is migrated.', error);
 
   await admin.from('projects').update({ updated_at: new Date().toISOString() }).eq('id', resolved.projectId);

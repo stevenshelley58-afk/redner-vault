@@ -25,7 +25,7 @@ export async function GET(_req: NextRequest, { params }: { params: Promise<{ pro
 
   const { data: project, error: projectError } = await admin
     .from('projects')
-    .select<ProjectRecord>('*')
+    .select('*')
     .eq('id', projectId)
     .eq('user_id', user.id)
     .single();
@@ -36,9 +36,9 @@ export async function GET(_req: NextRequest, { params }: { params: Promise<{ pro
   }
 
   const [assetsRes, notesRes, imagesRes] = await Promise.all([
-    admin.from('project_assets').select<ProjectAssetRecord>('*').eq('project_id', projectId).order('created_at', { ascending: false }),
-    admin.from('project_notes').select<ProjectNoteRecord>('*').eq('project_id', projectId).order('created_at', { ascending: false }),
-    admin.from('project_images').select<ProjectImageRecord>('*').eq('project_id', projectId).order('sort_order', { ascending: true }),
+    admin.from('project_assets').select('*').eq('project_id', projectId).order('created_at', { ascending: false }),
+    admin.from('project_notes').select('*').eq('project_id', projectId).order('created_at', { ascending: false }),
+    admin.from('project_images').select('*').eq('project_id', projectId).order('sort_order', { ascending: true }),
   ]);
 
   if (assetsRes.error) return respondDbError('Failed to load assets.', assetsRes.error);
