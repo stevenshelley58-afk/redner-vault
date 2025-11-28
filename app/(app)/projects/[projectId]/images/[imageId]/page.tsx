@@ -2,23 +2,9 @@
 
 export const dynamic = 'force-dynamic';
 
-import { useEffect, useMemo, useRef, useState, type MouseEvent } from 'react';
+import { useEffect, useMemo, useRef, useState, type MouseEvent, type TouchEvent } from 'react';
 import { useRouter } from 'next/navigation';
-import {
-  AlertTriangle,
-  ArrowLeft,
-  ArrowRight,
-  Check,
-  Circle,
-  Download,
-  Maximize,
-  MessageSquare,
-  Pencil,
-  RotateCcw,
-  Send,
-  ZoomIn,
-  ZoomOut,
-} from 'lucide-react';
+import { AlertTriangle, ArrowLeft, Check, Download, Maximize, MessageSquare, RotateCcw, Send, ZoomIn, ZoomOut } from 'lucide-react';
 import { StatusPill } from '../../../../../../components/app/StatusPill';
 import { Button } from '../../../../../../components/ui/Button';
 import { TextArea } from '../../../../../../components/ui/TextArea';
@@ -35,16 +21,19 @@ import type { ImageStatus } from '../../../../../../lib/status';
 
 type Annotation = {
   id: string;
-  tool: 'pen' | 'arrow' | 'circle';
+  tool: 'pen';
   points: { x: number; y: number }[];
   note: string;
   version_number: number;
+  color: string;
 };
 
 type AnnotationDraft = {
   tool: Annotation['tool'];
   points: { x: number; y: number }[];
 };
+
+const COLORS = ['#0071E3', '#22c55e', '#f59e0b', '#ef4444', '#a855f7', '#0ea5e9', '#ec4899'];
 
 function VersionSelector({
   versions,
@@ -80,25 +69,23 @@ function ImageViewport({
   onDownload,
   onFullscreen,
   annotations,
-  tool,
-  setTool,
   setDraft,
   draft,
   onEraseLast,
   onPlaceDraft,
   showAnnotations,
+  color,
 }: {
   version?: ImageVersion;
   onDownload: () => void;
   onFullscreen: () => void;
   annotations: Annotation[];
-  tool: Annotation['tool'] | 'select' | 'eraser';
-  setTool: (t: Annotation['tool'] | 'select' | 'eraser') => void;
   setDraft: (d: AnnotationDraft | null) => void;
   draft: AnnotationDraft | null;
   onEraseLast: () => void;
   onPlaceDraft: () => void;
   showAnnotations: boolean;
+  color: string;
 }) {
   const [zoom, setZoom] = useState(1);
   const [position, setPosition] = useState({ x: 0, y: 0 });
@@ -120,13 +107,11 @@ function ImageViewport({
 
   const startDrawing = (clientX: number, clientY: number, target: HTMLDivElement) => {
     if (!version) return;
-    if (tool === 'pen' || tool === 'arrow' || tool === 'circle') {
-      const bounds = target.getBoundingClientRect();
-      const x = (clientX - bounds.left) / bounds.width;
-      const y = (clientY - bounds.top) / bounds.height;
-      setDraft({ tool, points: [{ x, y }] });
-      isDrawing.current = true;
-    }
+    const bounds = target.getBoundingClientRect();
+    const x = (clientX - bounds.left) / bounds.width;
+    const y = (clientY - bounds.top) / bounds.height;
+    setDraft({ tool: 'pen', points: [{ x, y }] });
+    isDrawing.current = true;
   };
 
   const continueDrawing = (clientX: number, clientY: number, target: HTMLDivElement) => {
@@ -141,11 +126,7 @@ function ImageViewport({
     const bounds = target.getBoundingClientRect();
     const x = (clientX - bounds.left) / bounds.width;
     const y = (clientY - bounds.top) / bounds.height;
-    if (draft.tool === 'pen') {
-      setDraft({ ...draft, points: [...draft.points, { x, y }] });
-    } else {
-      setDraft({ ...draft, points: [draft.points[0], { x, y }] });
-    }
+    setDraft({ ...draft, points: [...draft.points, { x, y }] });
   };
 
   const stopDrawing = () => {
@@ -157,11 +138,6 @@ function ImageViewport({
   };
 
   const onMouseDown = (e: MouseEvent<HTMLDivElement>) => {
-    if (tool === 'select' && zoom > 1) {
-      setDragging(true);
-      dragStart.current = { x: e.clientX - position.x, y: e.clientY - position.y };
-      return;
-    }
     startDrawing(e.clientX, e.clientY, e.currentTarget);
   };
 
@@ -171,13 +147,13 @@ function ImageViewport({
 
   const onMouseUp = () => stopDrawing();
 
-  const onTouchStart = (e: React.TouchEvent<HTMLDivElement>) => {
+  const onTouchStart = (e: TouchEvent<HTMLDivElement>) => {
     const touch = e.touches[0];
     if (!touch) return;
     startDrawing(touch.clientX, touch.clientY, e.currentTarget);
   };
 
-  const onTouchMove = (e: React.TouchEvent<HTMLDivElement>) => {
+  const onTouchMove = (e: TouchEvent<HTMLDivElement>) => {
     const touch = e.touches[0];
     if (!touch) return;
     continueDrawing(touch.clientX, touch.clientY, e.currentTarget);
@@ -233,44 +209,18 @@ function ImageViewport({
       <div className="flex flex-wrap items-center gap-2 rounded-2xl border border-border-ghost bg-bg-paper px-3 py-2 text-sm text-text-subtle">
         <span className="text-xs font-semibold uppercase tracking-wide text-text-muted">Annotate</span>
         <div className="flex items-center gap-2">
+          <span className="text-xs text-text-subtle">Draw to add</span>
           <button
-            onClick={() => setTool('pen')}
-            className={`flex h-9 w-9 items-center justify-center rounded-lg border ${tool === 'pen' ? 'border-accent bg-accent/10 text-accent' : 'border-border-ghost bg-white text-text-ink'} transition`}
-            title="Freehand"
-          >
-            <Pencil className="h-4 w-4" />
-          </button>
-          <button
-            onClick={() => setTool('arrow')}
-            className={`flex h-9 w-9 items-center justify-center rounded-lg border ${tool === 'arrow' ? 'border-accent bg-accent/10 text-accent' : 'border-border-ghost bg-white text-text-ink'} transition`}
-            title="Arrow"
-          >
-            <ArrowRight className="h-4 w-4" />
-          </button>
-          <button
-            onClick={() => setTool('circle')}
-            className={`flex h-9 w-9 items-center justify-center rounded-lg border ${tool === 'circle' ? 'border-accent bg-accent/10 text-accent' : 'border-border-ghost bg-white text-text-ink'} transition`}
-            title="Circle"
-          >
-            <Circle className="h-4 w-4" />
-          </button>
-          <button
-            onClick={() => {
-              setTool('eraser');
-              onEraseLast();
-            }}
-            className={`flex h-9 w-9 items-center justify-center rounded-lg border ${tool === 'eraser' ? 'border-accent bg-accent/10 text-accent' : 'border-border-ghost bg-white text-text-ink'} transition`}
+            onClick={onEraseLast}
+            className="flex h-9 w-9 items-center justify-center rounded-lg border border-border-ghost bg-white text-text-ink transition hover:bg-surface"
             title="Erase last"
           >
             🧽
           </button>
-          <button
-            onClick={() => setTool('select')}
-            className={`flex h-9 px-3 items-center justify-center rounded-lg border ${tool === 'select' ? 'border-accent bg-accent/10 text-accent' : 'border-border-ghost bg-white text-text-ink'} transition text-xs`}
-            title="Pan"
-          >
-            Pan
-          </button>
+        </div>
+        <div className="flex items-center gap-2">
+          <span className="text-xs text-text-subtle">Color</span>
+          <span className="h-6 w-6 rounded-full border border-border-ghost" style={{ backgroundColor: color }} />
         </div>
       </div>
 
@@ -297,78 +247,18 @@ function ImageViewport({
         {showAnnotations && (
           <svg className="absolute inset-0 h-full w-full" viewBox="0 0 1000 1000" preserveAspectRatio="none">
             {annotations.map((ann) => {
-              if (ann.tool === 'pen') {
-                const d = ann.points.map((p, i) => `${i === 0 ? 'M' : 'L'} ${p.x * 1000} ${p.y * 1000}`).join(' ');
-                return <path key={ann.id} d={d} stroke="#0071E3" strokeWidth={3} fill="none" strokeLinecap="round" strokeLinejoin="round" />;
-              }
-              if (ann.tool === 'arrow') {
-                const [start, end] = ann.points;
-                const dx = end.x - start.x;
-                const dy = end.y - start.y;
-                const angle = Math.atan2(dy, dx);
-                const arrowLen = 18;
-                const arrowAngle = Math.PI / 7;
-                const x2 = end.x * 1000;
-                const y2 = end.y * 1000;
-                const line = `M ${start.x * 1000} ${start.y * 1000} L ${x2} ${y2}`;
-                const arrow1 = `L ${x2 - arrowLen * Math.cos(angle - arrowAngle)} ${y2 - arrowLen * Math.sin(angle - arrowAngle)}`;
-                const arrow2 = `M ${x2} ${y2} L ${x2 - arrowLen * Math.cos(angle + arrowAngle)} ${y2 - arrowLen * Math.sin(angle + arrowAngle)}`;
-                return (
-                  <g key={ann.id} stroke="#0071E3" strokeWidth={3} fill="none" strokeLinecap="round" strokeLinejoin="round">
-                    <path d={line} />
-                    <path d={arrow1} />
-                    <path d={arrow2} />
-                  </g>
-                );
-              }
-              if (ann.tool === 'circle') {
-                const [start, end] = ann.points;
-                const rx = (end.x - start.x) * 1000;
-                const ry = (end.y - start.y) * 1000;
-                const r = Math.sqrt(rx * rx + ry * ry);
-                return <circle key={ann.id} cx={start.x * 1000} cy={start.y * 1000} r={r} stroke="#0071E3" strokeWidth={3} fill="none" />;
-              }
-              return null;
+              const d = ann.points.map((p, i) => `${i === 0 ? 'M' : 'L'} ${p.x * 1000} ${p.y * 1000}`).join(' ');
+              return <path key={ann.id} d={d} stroke={ann.color} strokeWidth={3} fill="none" strokeLinecap="round" strokeLinejoin="round" />;
             })}
             {draft && (
-              <>
-                {draft.tool === 'pen' && (
-                  <path
-                    d={draft.points.map((p, i) => `${i === 0 ? 'M' : 'L'} ${p.x * 1000} ${p.y * 1000}`).join(' ')}
-                    stroke="#0071E3"
-                    strokeWidth={2}
-                    fill="none"
-                    strokeDasharray="6 4"
-                    strokeLinecap="round"
-                  />
-                )}
-                {draft.tool === 'arrow' && draft.points.length === 2 && (
-                  <line
-                    x1={draft.points[0].x * 1000}
-                    y1={draft.points[0].y * 1000}
-                    x2={draft.points[1].x * 1000}
-                    y2={draft.points[1].y * 1000}
-                    stroke="#0071E3"
-                    strokeWidth={2}
-                    strokeDasharray="6 4"
-                    strokeLinecap="round"
-                  />
-                )}
-                {draft.tool === 'circle' && draft.points.length === 2 && (
-                  <circle
-                    cx={draft.points[0].x * 1000}
-                    cy={draft.points[0].y * 1000}
-                    r={Math.sqrt(
-                      Math.pow((draft.points[1].x - draft.points[0].x) * 1000, 2) +
-                        Math.pow((draft.points[1].y - draft.points[0].y) * 1000, 2),
-                    )}
-                    stroke="#0071E3"
-                    strokeWidth={2}
-                    strokeDasharray="6 4"
-                    fill="none"
-                  />
-                )}
-              </>
+              <path
+                d={draft.points.map((p, i) => `${i === 0 ? 'M' : 'L'} ${p.x * 1000} ${p.y * 1000}`).join(' ')}
+                stroke={color}
+                strokeWidth={2}
+                fill="none"
+                strokeDasharray="6 4"
+                strokeLinecap="round"
+              />
             )}
           </svg>
         )}
@@ -460,12 +350,12 @@ export default function ImageDetailPage({ params }: { params: { projectId: strin
   const [imageStatus, setImageStatus] = useState<ImageStatus>(image?.status ?? 'draft');
   const [fullscreen, setFullscreen] = useState(false);
   const [annotationsByVersion, setAnnotationsByVersion] = useState<Record<number, Annotation[]>>({});
-  const [tool, setTool] = useState<Annotation['tool'] | 'select' | 'eraser'>('select');
   const [draft, setDraft] = useState<AnnotationDraft | null>(null);
   const [noteDraft, setNoteDraft] = useState('');
   const [showAnnotations, setShowAnnotations] = useState(true);
 
   const annotations = annotationsByVersion[activeVersion?.version_number ?? 0] ?? [];
+  const nextColor = COLORS[annotations.length % COLORS.length];
 
   if (!image) {
     return (
@@ -547,8 +437,6 @@ export default function ImageDetailPage({ params }: { params: { projectId: strin
               onDownload={() => activeVersion && window.open(activeVersion.output_url, '_blank')}
               onFullscreen={() => setFullscreen(true)}
               annotations={annotations}
-              tool={tool}
-              setTool={setTool}
               setDraft={setDraft}
               draft={draft}
               onEraseLast={() => {
@@ -560,13 +448,14 @@ export default function ImageDetailPage({ params }: { params: { projectId: strin
               }}
               onPlaceDraft={() => {}}
               showAnnotations={showAnnotations}
+              color={nextColor}
             />
 
             {draft && (
               <div className="rounded-2xl border border-border-ghost bg-bg-paper p-3 flex flex-col gap-2">
                 <div className="flex items-center justify-between text-sm font-semibold text-text-ink">
                   <span>Add note to annotation</span>
-                  <Button variant="ghost" className="px-2 py-1 text-xs" onClick={() => { setDraft(null); setNoteDraft(''); setTool('select'); }}>
+                  <Button variant="ghost" className="px-2 py-1 text-xs" onClick={() => { setDraft(null); setNoteDraft(''); }}>
                     Cancel
                   </Button>
                 </div>
@@ -593,13 +482,13 @@ export default function ImageDetailPage({ params }: { params: { projectId: strin
                               points: draft.points,
                               note: noteDraft.trim(),
                               version_number: activeVersion.version_number,
+                              color: nextColor,
                             },
                           ],
                         };
                       });
                       setDraft(null);
                       setNoteDraft('');
-                      setTool('select');
                     }}
                     disabled={!noteDraft.trim()}
                   >
@@ -609,11 +498,6 @@ export default function ImageDetailPage({ params }: { params: { projectId: strin
               </div>
             )}
 
-            <CommentsPanel
-              comments={comments}
-              activeVersion={activeVersion?.version_number}
-              onAdd={handleAddComment}
-            />
             <div className="rounded-2xl border border-border-ghost bg-bg-paper px-4 py-3 space-y-3">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2 text-sm font-semibold text-text-ink">
@@ -637,11 +521,8 @@ export default function ImageDetailPage({ params }: { params: { projectId: strin
                     <div key={ann.id} className="flex items-start justify-between gap-2 rounded-lg border border-border-ghost bg-white px-3 py-2 text-sm">
                       <div className="flex flex-col gap-1">
                         <div className="flex items-center gap-2">
-                          <span className="h-2 w-2 rounded-full bg-accent" />
+                          <span className="h-2 w-2 rounded-full" style={{ backgroundColor: ann.color }} />
                           <span className="font-medium">#{idx + 1}</span>
-                          <span className="text-[11px] uppercase text-text-subtle">
-                            {ann.tool}
-                          </span>
                         </div>
                         <span className="text-text-subtle/80">{ann.note}</span>
                       </div>
@@ -650,6 +531,12 @@ export default function ImageDetailPage({ params }: { params: { projectId: strin
                 </div>
               )}
             </div>
+
+            <CommentsPanel
+              comments={comments}
+              activeVersion={activeVersion?.version_number}
+              onAdd={handleAddComment}
+            />
           </div>
           <div className="mt-3 flex items-center justify-between rounded-2xl border border-border-ghost bg-surface px-4 py-3">
             <div className="flex items-center gap-2 text-sm text-text-subtle">
