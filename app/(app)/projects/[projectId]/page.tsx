@@ -2,7 +2,7 @@
 
 export const dynamic = 'force-dynamic';
 
-import { useMemo, useState } from 'react';
+import { useMemo, useRef, useState } from 'react';
 import type { ReactNode } from 'react';
 import { useRouter } from 'next/navigation';
 import { ArrowLeft, Calendar, FileText, Image as ImageIcon, MessageSquare, Upload, Plus } from 'lucide-react';
