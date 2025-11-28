@@ -1,5 +1,7 @@
 'use client';
 
+export const dynamic = 'force-dynamic';
+
 import { useEffect, useMemo, useRef, useState, type MouseEvent } from 'react';
 import { useRouter } from 'next/navigation';
 import {
@@ -238,13 +240,14 @@ function CommentsPanel({
 
 export default function ImageDetailPage({ params }: { params: { projectId: string; imageId: string } }) {
   const router = useRouter();
-  const image = demoImages.find((img) => img.id === params.imageId);
+  const fallbackImage = demoImages[0];
+  const image = demoImages.find((img) => img.id === params.imageId) ?? fallbackImage;
   const versions = useMemo(
-    () => (demoImageVersions[params.imageId] ?? []).sort((a, b) => b.version_number - a.version_number),
-    [params.imageId],
+    () => (demoImageVersions[image.id] ?? []).sort((a, b) => b.version_number - a.version_number),
+    [image.id],
   );
   const [activeVersion, setActiveVersion] = useState<ImageVersion | undefined>(versions[0]);
-  const [comments, setComments] = useState<ImageComment[]>(demoImageComments[params.imageId] ?? []);
+  const [comments, setComments] = useState<ImageComment[]>(demoImageComments[image.id] ?? []);
   const [imageStatus, setImageStatus] = useState<ImageStatus>(image?.status ?? 'draft');
   const [fullscreen, setFullscreen] = useState(false);
 
@@ -351,6 +354,18 @@ export default function ImageDetailPage({ params }: { params: { projectId: strin
                 </Button>
               )}
             </div>
+          </div>
+          <div className="rounded-2xl border border-border-ghost bg-bg-paper px-4 py-3">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-2 text-sm font-semibold text-text-ink">
+                <MessageSquare className="h-4 w-4 text-text-subtle" />
+                Annotations
+              </div>
+              <span className="text-xs text-text-subtle">Coming soon</span>
+            </div>
+            <p className="mt-2 text-sm text-text-subtle">
+              Inline pins and markup will live here. For now, use comments to leave feedback on this version.
+            </p>
           </div>
         </div>
       </div>

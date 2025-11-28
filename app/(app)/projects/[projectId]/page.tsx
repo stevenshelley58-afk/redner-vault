@@ -1,5 +1,7 @@
 'use client';
 
+export const dynamic = 'force-dynamic';
+
 import { useMemo, useState } from 'react';
 import type { ReactNode } from 'react';
 import { useRouter } from 'next/navigation';
@@ -52,8 +54,9 @@ function SectionCard({
   );
 }
 
-function AssetGrid({ assets }: { assets: ProjectAsset[] }) {
+function AssetGrid({ assets, onUpload }: { assets: ProjectAsset[]; onUpload?: (file: File) => void }) {
   const [active, setActive] = useState<AssetTab>('all');
+  const fileInputRef = useRef<HTMLInputElement | null>(null);
 
   const tabs: AssetTab[] = ['all', 'source_image', 'reference_image', 'material_doc', 'inspiration', 'other'];
   const counts = useMemo(() => {
@@ -66,8 +69,21 @@ function AssetGrid({ assets }: { assets: ProjectAsset[] }) {
 
   const filtered = active === 'all' ? assets : assets.filter((a) => a.type === active);
 
+  const triggerUpload = () => fileInputRef.current?.click();
+
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file && onUpload) {
+      onUpload(file);
+    }
+    if (fileInputRef.current) {
+      fileInputRef.current.value = '';
+    }
+  };
+
   return (
     <div className="space-y-3">
+      <input ref={fileInputRef} type="file" className="hidden" onChange={handleFileChange} />
       <div className="flex gap-2 overflow-x-auto pb-1">
         {tabs
           .filter((tab) => counts[tab] > 0 || tab === 'all')
@@ -88,6 +104,11 @@ function AssetGrid({ assets }: { assets: ProjectAsset[] }) {
       </div>
 
       <div className="grid grid-cols-2 gap-3 md:grid-cols-4">
+        {filtered.length === 0 && (
+          <div className="col-span-full rounded-xl border border-dashed border-border-ghost bg-surface/60 p-4 text-center text-sm text-text-subtle">
+            No assets yet. Upload to get started.
+          </div>
+        )}
         {filtered.map((asset) => (
           <div key={asset.id} className="flex flex-col gap-2 rounded-xl border border-border-ghost bg-surface p-3 shadow-sm">
             {asset.file_thumbnail_url ? (
@@ -113,6 +134,13 @@ function AssetGrid({ assets }: { assets: ProjectAsset[] }) {
             </div>
           </div>
         ))}
+        <button
+          onClick={triggerUpload}
+          className="flex flex-col items-center justify-center gap-2 rounded-xl border border-dashed border-border-ghost bg-white/70 p-4 text-text-subtle transition hover:border-accent hover:text-accent"
+        >
+          <Upload className="h-5 w-5" />
+          <span className="text-sm font-medium">Upload asset</span>
+        </button>
       </div>
     </div>
   );
@@ -205,6 +233,7 @@ function NotesSection({ notes, onAdd }: { notes: ProjectNote[]; onAdd: (body: st
 export default function ProjectWorkspacePage({ params }: { params: { projectId: string } }) {
   const router = useRouter();
   const [notes, setNotes] = useState<ProjectNote[]>(demoNotes);
+  const [assets, setAssets] = useState<ProjectAsset[]>(demoAssets);
   const projectId = params?.projectId ?? demoProject.id;
 
   return (
@@ -254,7 +283,21 @@ export default function ProjectWorkspacePage({ params }: { params: { projectId: 
 
       <div className="space-y-4">
         <SectionCard title="Assets" icon={<Upload className="h-5 w-5 text-text-ink" />}>
-          <AssetGrid assets={demoAssets} />
+          <AssetGrid
+            assets={assets}
+            onUpload={(file) =>
+              setAssets((prev) => [
+                {
+                  id: `upload_${Date.now()}`,
+                  type: 'other',
+                  label: file.name,
+                  file_thumbnail_url: URL.createObjectURL(file),
+                  created_at: new Date().toISOString(),
+                },
+                ...prev,
+              ])
+            }
+          />
         </SectionCard>
 
         <SectionCard
