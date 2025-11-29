@@ -9,13 +9,13 @@ export default function ProofWall() {
         },
         {
             title: "Beauty",
-            before: "/images/beauty-before.jpg",
-            after: "/images/beauty-after.jpg"
+            before: "/images/beauty-before.png",
+            after: "/images/beauty-after.png"
         },
         {
             title: "Apparel",
-            before: "/images/bag.png",
-            after: "/images/bag (1).png"
+            before: "/images/apparel-before.png",
+            after: "/images/apparel-after.png"
         }
     ];
 
