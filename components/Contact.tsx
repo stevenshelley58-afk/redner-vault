@@ -95,7 +95,7 @@ export default function Contact() {
           Got a project in mind?
         </h2>
         <p className="text-lg text-text-subtle mb-12 text-center">
-          Tell us what you're working on — we'll get back to you within a day.
+          Tell us what you're working on and we'll get back to you within a day.
         </p>
 
         <form onSubmit={handleSubmit} className="space-y-5">
