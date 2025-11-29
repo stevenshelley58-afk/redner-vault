@@ -1,26 +1,63 @@
+import TactileReveal from "./TactileReveal";
+
 export default function FounderSection() {
+  const examples = [
+    {
+      title: "Furniture",
+      before: "/images/mirror-before.png",
+      after: "/images/mirror-after.png"
+    },
+    {
+      title: "Beauty",
+      before: "/images/beauty-before.png",
+      after: "/images/beauty-after.png"
+    },
+    {
+      title: "Apparel",
+      before: "/images/apparel-before.png",
+      after: "/images/apparel-after.png"
+    }
+  ];
+
   return (
     <section className="py-16 px-6 md:px-0 bg-paper">
-      <div className="max-w-[800px] mx-auto w-full">
-        <p className="text-xs font-semibold tracking-[0.18em] text-text-subtle uppercase mb-6">
-          From one founder to another
-        </p>
-        <h2 className="text-2xl md:text-3xl font-medium text-text-ink mb-6">
-          We did the hard yards so you don&apos;t have to.
-        </h2>
-        <div className="space-y-6 text-stone-600">
-          <p className="leading-relaxed">
-            We&apos;re Em &amp; Steve, Aussie founders running{' '}
-            <a href="#" className="text-stone-800 underline underline-offset-2">bhm.com.au</a>.
+      <div className="max-w-[1200px] mx-auto w-full">
+        <div className="max-w-[800px] mb-12">
+          <p className="text-xs font-semibold tracking-[0.18em] text-text-subtle uppercase mb-6">
+            From one founder to another
           </p>
-          <p className="leading-relaxed">
-            After repeated agency letdowns, we taught ourselves everything 
-            from social to paid ads. Now we use AI to create natural, 
-            human-first visuals.
-          </p>
-          <p className="text-sm text-stone-400 pt-2 leading-relaxed">
-            No plastic skin · No weird hands · No AI slop
-          </p>
+          <h2 className="text-2xl md:text-3xl font-medium text-text-ink mb-6">
+            We did the hard yards so you don&apos;t have to.
+          </h2>
+          <div className="space-y-6 text-stone-600">
+            <p className="leading-relaxed">
+              We&apos;re Em &amp; Steve, Aussie founders running{' '}
+              <a href="#" className="text-stone-800 underline underline-offset-2">bhm.com.au</a>.
+            </p>
+            <p className="leading-relaxed">
+              After repeated agency letdowns, we taught ourselves everything 
+              from social to paid ads. Now we use AI to create natural, 
+              human-first visuals.
+            </p>
+            <p className="text-sm text-stone-400 pt-2 leading-relaxed">
+              No plastic skin · No weird hands · No AI slop
+            </p>
+          </div>
+        </div>
+
+        <div className="grid grid-cols-4 md:grid-cols-12 gap-8">
+          {examples.map((item) => (
+            <div key={item.title} className="col-span-4 md:col-span-4 space-y-4">
+              <div className="aspect-square w-full bg-surface rounded-2xl overflow-hidden relative shadow-md group">
+                <TactileReveal
+                  beforeImage={item.before}
+                  afterImage={item.after}
+                  className="h-full"
+                />
+              </div>
+              <p className="font-medium text-text-ink">{item.title}</p>
+            </div>
+          ))}
         </div>
       </div>
     </section>
