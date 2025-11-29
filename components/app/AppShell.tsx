@@ -3,10 +3,9 @@
 import type { ReactNode } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { Bell, LayoutDashboard, LifeBuoy, Plus, Sparkles, UserRound } from 'lucide-react';
+import { LayoutDashboard, LifeBuoy, Plus, Sparkles, UserRound } from 'lucide-react';
 import clsx from 'clsx';
 import { Button } from '../ui/Button';
-import { Badge } from '../ui/Badge';
 import { AvatarCircle } from './AvatarCircle';
 
 interface AppShellProps {
@@ -125,24 +124,8 @@ export function AppShell({ children }: AppShellProps) {
                   <p className="text-[10px] text-[#7e8aa7] truncate">Workspace</p>
                 </div>
               </div>
-              <Badge variant="accent" className="hidden sm:inline-flex bg-[#e8eef9] text-[#3f5f82] ring-1 ring-[#d8e3f5] text-xs shrink-0">
-                Vault Studio - Free plan
-              </Badge>
             </div>
             <div className="flex items-center gap-1.5 shrink-0">
-              <Link href="/projects/new">
-                <Button
-                  variant="secondary"
-                  className="rounded-full bg-white text-[#1b2559] shadow-[0_10px_24px_rgba(112,144,176,0.18)] hover:bg-white/90 h-9 px-3 lg:px-4"
-                  iconLeft={<Plus className="h-4 w-4" />}
-                >
-                  <span className="hidden sm:inline">Start brief</span>
-                  <span className="sm:hidden">New</span>
-                </Button>
-              </Link>
-              <button className="flex h-9 w-9 items-center justify-center rounded-full bg-white text-[#4f78a5] shadow-[0_8px_18px_rgba(112,144,176,0.18)] transition hover:bg-white/90">
-                <Bell className="h-4 w-4 lg:h-5 lg:w-5" />
-              </button>
               <Link href="/profile" className="flex items-center">
                 <AvatarCircle />
               </Link>

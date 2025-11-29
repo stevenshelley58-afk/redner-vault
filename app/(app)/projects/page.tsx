@@ -1,8 +1,8 @@
 'use client';
 
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import type { ComponentType } from 'react';
-import { Calendar, Image as ImageIcon, Layers, Plus, Search, Sparkles } from 'lucide-react';
+import { Calendar, ChevronRight, Image as ImageIcon, Layers, Plus, Search, Sparkles } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import clsx from 'clsx';
 import { Button } from '../../../components/ui/Button';
@@ -197,15 +197,81 @@ function NewProjectSheet({
   );
 }
 
+function MobileHomeCard({
+  icon: Icon,
+  label,
+  description,
+  onClick,
+}: {
+  icon: ComponentType<{ className?: string }>;
+  label: string;
+  description?: string;
+  onClick: () => void;
+}) {
+  return (
+    <button
+      onClick={onClick}
+      className="flex w-full items-center gap-4 rounded-2xl border border-white/70 bg-white px-4 py-4 text-left shadow-[0_16px_40px_rgba(0,0,0,0.06)] transition active:translate-y-[1px] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#4f78a5]"
+    >
+      <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-[#f5f7fb] text-[#4f78a5]">
+        <Icon className="h-6 w-6" />
+      </div>
+      <div className="flex-1 space-y-1">
+        <p className="text-lg font-semibold text-[#1b2559]">{label}</p>
+        {description && <p className="text-sm text-[#7e8aa7]">{description}</p>}
+      </div>
+      <ChevronRight className="h-5 w-5 text-[#9aa5bf]" />
+    </button>
+  );
+}
+
+function DashboardMobileHome({
+  activeCount,
+  onOpenProjects,
+  onNewProject,
+  onAccount,
+  onContact,
+}: {
+  activeCount: number;
+  onOpenProjects: () => void;
+  onNewProject: () => void;
+  onAccount: () => void;
+  onContact: () => void;
+}) {
+  return (
+    <div className="block md:hidden">
+      <div className="flex flex-col items-center gap-2 py-6">
+        <div className="flex h-14 w-14 items-center justify-center rounded-[16px] bg-gradient-to-br from-[#4b6a8e] via-[#4f78a5] to-[#6bc6b5] text-white shadow-[0_16px_40px_rgba(0,0,0,0.08)]">
+          RV
+        </div>
+        <h1 className="text-2xl font-semibold text-[#1b2559]">Render Vault</h1>
+      </div>
+      <div className="space-y-3 pb-2">
+        <MobileHomeCard
+          icon={ImageIcon}
+          label="Current Projects"
+          description={`${activeCount} active`}
+          onClick={onOpenProjects}
+        />
+        <MobileHomeCard icon={Plus} label="Start New Project" onClick={onNewProject} />
+        <MobileHomeCard icon={Layers} label="Your Account" onClick={onAccount} />
+        <MobileHomeCard icon={Sparkles} label="Contact Us" onClick={onContact} />
+      </div>
+    </div>
+  );
+}
+
 export default function ProjectsPage() {
   const router = useRouter();
   const [projects, setProjects] = useState<ProjectRecord[]>([]);
   const [search, setSearch] = useState('');
   const [filter, setFilter] = useState<FilterKey>('all');
   const [sheetOpen, setSheetOpen] = useState(false);
+  const [showFullMobileDashboard, setShowFullMobileDashboard] = useState(false);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [now] = useState(() => Date.now());
+  const projectsSectionRef = useRef<HTMLDivElement>(null);
 
   const loadProjects = useCallback(async () => {
     setLoading(true);
@@ -300,7 +366,20 @@ export default function ProjectsPage() {
 
   return (
     <div className="space-y-6">
-      <section className="grid gap-4">
+      <DashboardMobileHome
+        activeCount={stats.active}
+        onOpenProjects={() => {
+          setShowFullMobileDashboard(true);
+          projectsSectionRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }}
+        onNewProject={() => setSheetOpen(true)}
+        onAccount={() => router.push('/profile')}
+        onContact={() => {
+          window.location.href = 'mailto:hello@rendervault.studio';
+        }}
+      />
+
+      <section className={clsx('grid gap-4', showFullMobileDashboard ? undefined : 'hidden md:grid')}>
         <div className="overflow-hidden rounded-[28px] bg-gradient-to-br from-[#4b6a8e] via-[#4f78a5] to-[#6bc6b5] text-white shadow-[0_18px_40px_rgba(79,120,165,0.28)]">
           <div className="flex flex-col gap-6 p-6">
             <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
@@ -345,7 +424,13 @@ export default function ProjectsPage() {
         </div>
       </section>
 
-      <section className="rounded-[20px] border border-white/70 bg-white/95 p-4 shadow-[0_14px_32px_rgba(112,144,176,0.12)]">
+      <section
+        ref={projectsSectionRef}
+        className={clsx(
+          'rounded-[20px] border border-white/70 bg-white/95 p-4 shadow-[0_14px_32px_rgba(112,144,176,0.12)]',
+          showFullMobileDashboard ? 'block' : 'hidden md:block',
+        )}
+      >
         <div className="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
           <div className="relative w-full lg:max-w-xl">
             <Search className="pointer-events-none absolute left-3 top-2.5 h-4 w-4 text-[#9aa5bf]" />
@@ -360,13 +445,6 @@ export default function ProjectsPage() {
             <Badge className="bg-[#f5f7fb] text-[#3f4b68] ring-1 ring-white/70">
               Showing {filtered.length} of {projects.length}
             </Badge>
-            <Button
-              onClick={() => setSheetOpen(true)}
-              iconLeft={<Plus className="h-4 w-4" />}
-              className="rounded-full bg-[#4f78a5] text-white shadow-[0_12px_28px_rgba(79,120,165,0.24)] hover:bg-[#486f98]"
-            >
-              New project
-            </Button>
           </div>
         </div>
         <div className="mt-3">

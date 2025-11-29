@@ -14,8 +14,8 @@ export default function ProofWall() {
         },
         {
             title: "Toys",
-            before: "/images/toys-before.png",
-            after: "/images/toys-after.png"
+            before: "/images/bag.png",
+            after: "/images/bag (1).png"
         }
     ];
 
