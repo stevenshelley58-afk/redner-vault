@@ -1,11 +1,21 @@
 "use client";
 
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 import { AnimatePresence } from "framer-motion";
 import IntakeWizard from "./IntakeWizard";
 
 export default function LiquidDock() {
     const [isOpen, setIsOpen] = useState(false);
+    const router = useRouter();
+    const isDev = process.env.NODE_ENV === 'development';
+
+    const handleLoginClick = (e: React.MouseEvent<HTMLAnchorElement>) => {
+        if (isDev) {
+            e.preventDefault();
+            router.push('/projects');
+        }
+    };
 
     return (
         <>
@@ -16,7 +26,8 @@ export default function LiquidDock() {
                 </div>
                 <div className="flex items-center gap-3">
                     <a
-                        href="/login"
+                        href={isDev ? "/projects" : "/login"}
+                        onClick={handleLoginClick}
                         className="rounded-full border border-border-ghost px-4 py-2 text-sm font-medium text-text-subtle transition hover:bg-surface"
                     >
                         Login
@@ -30,7 +41,8 @@ export default function LiquidDock() {
                     <img src="/images/render-vault-logo-v2.png" alt="Render Vault" className="object-contain h-full w-full" />
                 </div>
                 <a
-                    href="/login"
+                    href={isDev ? "/projects" : "/login"}
+                    onClick={handleLoginClick}
                     className="rounded-full border border-border-ghost px-3 py-1.5 text-sm font-medium text-text-subtle transition hover:bg-surface"
                 >
                     Login
