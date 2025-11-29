@@ -6,6 +6,7 @@ import LiquidDock from "@/components/LiquidDock";
 import Hero from "@/components/Hero";
 import PainContrast from "@/components/PainContrast";
 import ProofWall from "@/components/ProofWall";
+import FounderSection from "@/components/FounderSection";
 import HowItWorks from "@/components/HowItWorks";
 import Pricing from "@/components/Pricing";
 import UseCases from "@/components/UseCases";
@@ -21,6 +22,7 @@ export default function Home() {
 
       <Hero />
       <PainContrast />
+      <FounderSection />
       <ProofWall />
       <HowItWorks onOpenWizard={() => setIsWizardOpen(true)} />
       <Pricing />
