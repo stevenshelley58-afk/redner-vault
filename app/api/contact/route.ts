@@ -17,8 +17,12 @@ function getClientIP(req: NextRequest): string {
     // x-forwarded-for can contain multiple IPs, take the first one
     return forwarded.split(',')[0].trim();
   }
-  // Fallback to request.ip if available
-  return req.ip || 'unknown';
+  // Fallback to x-real-ip if available (some proxies use this)
+  const realIp = req.headers.get('x-real-ip');
+  if (realIp) {
+    return realIp;
+  }
+  return 'unknown';
 }
 
 function checkRateLimit(ip: string): boolean {
