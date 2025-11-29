@@ -113,45 +113,46 @@ export function AppShell({ children }: AppShellProps) {
       </aside>
 
       <div className="flex min-h-screen flex-1 flex-col">
-        <header className="sticky top-0 z-20 border-b border-white/70 bg-[#f5f7fb]/85 px-4 py-4 backdrop-blur supports-[backdrop-filter]:bg-[#f5f7fb]/75 lg:px-8">
-          <div className="flex items-center justify-between gap-3">
-            <div className="flex items-center gap-3">
-              <div className="flex items-center gap-2 lg:hidden">
-                <div className="flex h-10 w-10 items-center justify-center rounded-[14px] bg-gradient-to-br from-[#4b6a8e] via-[#4f78a5] to-[#6bc6b5] text-white shadow-[0_10px_28px_rgba(79,120,165,0.28)]">
+        <header className="sticky top-0 z-20 border-b border-white/70 bg-[#f5f7fb]/85 px-4 py-3 backdrop-blur supports-[backdrop-filter]:bg-[#f5f7fb]/75 lg:px-8 lg:py-4">
+          <div className="flex items-center justify-between gap-2">
+            <div className="flex items-center gap-2 min-w-0 flex-1">
+              <div className="flex items-center gap-2 lg:hidden shrink-0">
+                <div className="flex h-9 w-9 items-center justify-center rounded-[12px] bg-gradient-to-br from-[#4b6a8e] via-[#4f78a5] to-[#6bc6b5] text-white shadow-[0_10px_28px_rgba(79,120,165,0.28)]">
                   RV
                 </div>
-                <div>
-                  <p className="text-sm font-semibold">Render Vault</p>
-                  <p className="text-xs text-[#7e8aa7]">Workspace</p>
+                <div className="min-w-0">
+                  <p className="text-sm font-semibold truncate">Render Vault</p>
+                  <p className="text-[10px] text-[#7e8aa7] truncate">Workspace</p>
                 </div>
               </div>
-              <Badge variant="accent" className="bg-[#e8eef9] text-[#3f5f82] ring-1 ring-[#d8e3f5]">
+              <Badge variant="accent" className="hidden sm:inline-flex bg-[#e8eef9] text-[#3f5f82] ring-1 ring-[#d8e3f5] text-xs shrink-0">
                 Vault Studio - Free plan
               </Badge>
             </div>
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-1.5 shrink-0">
               <Link href="/projects/new">
                 <Button
                   variant="secondary"
-                  className="rounded-full bg-white text-[#1b2559] shadow-[0_10px_24px_rgba(112,144,176,0.18)] hover:bg-white/90"
+                  className="rounded-full bg-white text-[#1b2559] shadow-[0_10px_24px_rgba(112,144,176,0.18)] hover:bg-white/90 h-9 px-3 lg:px-4"
                   iconLeft={<Plus className="h-4 w-4" />}
                 >
-                  Start brief
+                  <span className="hidden sm:inline">Start brief</span>
+                  <span className="sm:hidden">New</span>
                 </Button>
               </Link>
-              <button className="flex h-10 w-10 items-center justify-center rounded-full bg-white text-[#4f78a5] shadow-[0_8px_18px_rgba(112,144,176,0.18)] transition hover:bg-white/90">
-                <Bell className="h-5 w-5" />
+              <button className="flex h-9 w-9 items-center justify-center rounded-full bg-white text-[#4f78a5] shadow-[0_8px_18px_rgba(112,144,176,0.18)] transition hover:bg-white/90">
+                <Bell className="h-4 w-4 lg:h-5 lg:w-5" />
               </button>
-              <Link href="/profile" className="flex items-center gap-2">
+              <Link href="/profile" className="flex items-center">
                 <AvatarCircle />
               </Link>
             </div>
           </div>
         </header>
 
-        <main className="relative flex-1 px-4 pb-10 pt-6 lg:px-10">
+        <main className="relative flex-1 px-4 pb-6 pt-4 lg:px-10 lg:pb-10 lg:pt-6">
           <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_20%_20%,rgba(79,120,165,0.08),transparent_45%),radial-gradient(circle_at_80%_0%,rgba(107,203,119,0.07),transparent_42%)]" />
-          <div className="relative z-10 mx-auto flex max-w-6xl flex-col gap-6">{children}</div>
+          <div className="relative z-10 mx-auto flex max-w-6xl flex-col gap-4 lg:gap-6">{children}</div>
         </main>
       </div>
     </div>
