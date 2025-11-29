@@ -635,7 +635,7 @@ const ProjectsUsageSection = ({ usage }) => {
       </div>
 
       <div className="section-actions">
-        <Button variant="secondary" onClick={() => window.location.href = '/projects'}>
+        <Button variant="secondary" onClick={() => window.location.href = '/dashboard'}>
           View all projects
         </Button>
       </div>

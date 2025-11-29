@@ -386,7 +386,7 @@ export default function ProjectWorkspacePage({ params }: { params: { projectId: 
     return (
       <div className="mx-auto max-w-5xl space-y-3">
         <button
-          onClick={() => router.push('/projects')}
+          onClick={() => router.push('/dashboard')}
           className="inline-flex items-center gap-2 text-sm font-medium text-text-subtle transition hover:text-text-ink"
         >
           <ArrowLeft className="h-4 w-4" />
@@ -403,7 +403,7 @@ export default function ProjectWorkspacePage({ params }: { params: { projectId: 
     <div className="mx-auto max-w-5xl space-y-4">
       <div className="flex items-center justify-between">
         <button
-          onClick={() => router.push('/projects')}
+          onClick={() => router.push('/dashboard')}
           className="inline-flex items-center gap-2 text-sm font-medium text-text-subtle transition hover:text-text-ink"
         >
           <ArrowLeft className="h-4 w-4" />

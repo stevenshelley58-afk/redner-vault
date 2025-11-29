@@ -15,9 +15,9 @@ interface AppShellProps {
 const navItems = [
   {
     label: 'Dashboard',
-    href: '/projects',
+    href: '/dashboard',
     icon: LayoutDashboard,
-    match: (path: string) => path.startsWith('/projects'),
+    match: (path: string) => path.startsWith('/dashboard'),
   },
   {
     label: 'Profile',
@@ -41,7 +41,7 @@ export function AppShell({ children }: AppShellProps) {
     <div className="flex min-h-screen bg-[#f5f7fb] text-[#1b2559]">
       <aside className="relative hidden w-[250px] shrink-0 border-r border-white/70 bg-white/95 px-4 py-6 shadow-[0_18px_40px_rgba(112,144,176,0.12)] lg:block">
         <div className="sticky top-6 flex h-[calc(100vh-48px)] flex-col rounded-[22px] bg-white/95 p-4 shadow-[0_18px_40px_rgba(112,144,176,0.16)] ring-1 ring-white/80">
-          <Link href="/projects" className="flex items-center gap-3 rounded-2xl px-2 py-2 hover:bg-[#f5f7fb]">
+          <Link href="/dashboard" className="flex items-center gap-3 rounded-2xl px-2 py-2 hover:bg-[#f5f7fb]">
             <div className="flex h-10 w-10 items-center justify-center rounded-[14px] bg-gradient-to-br from-[#4b6a8e] via-[#4f78a5] to-[#6bc6b5] text-white shadow-[0_10px_28px_rgba(79,120,165,0.28)]">
               RV
             </div>

@@ -18,8 +18,8 @@ export default function LoginPage() {
       const supabase = createSupabaseBrowserClient();
       const redirectTo =
         typeof window !== 'undefined'
-          ? `${window.location.origin}/projects`
-          : 'https://render-vault.vercel.app/projects';
+          ? `${window.location.origin}/dashboard`
+          : 'https://render-vault.vercel.app/dashboard';
 
       const { error } = await supabase.auth.signInWithOtp({
         email,
@@ -61,7 +61,7 @@ export default function LoginPage() {
       setStatus('idle');
       setMessage('Signed in. Redirecting...');
       if (typeof window !== 'undefined') {
-        window.location.href = '/projects';
+        window.location.href = '/dashboard';
       }
     } catch (err) {
       setStatus('error');

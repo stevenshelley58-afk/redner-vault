@@ -30,7 +30,7 @@ export default function NewProjectPage() {
   return (
     <div className="mx-auto max-w-3xl space-y-4">
       <button
-        onClick={() => router.push('/projects')}
+        onClick={() => router.push('/dashboard')}
         className="inline-flex items-center gap-2 text-sm font-medium text-text-subtle transition hover:text-text-ink"
       >
         <ArrowLeft className="h-4 w-4" />
@@ -47,7 +47,7 @@ export default function NewProjectPage() {
 
         <NewProjectForm
           onCreate={handleCreate}
-          onCancel={() => router.push('/projects')}
+          onCancel={() => router.push('/dashboard')}
           submitLabel="Create project"
         />
       </div>

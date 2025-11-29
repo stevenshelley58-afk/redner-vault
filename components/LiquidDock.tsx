@@ -13,7 +13,7 @@ export default function LiquidDock() {
     const handleLoginClick = (e: React.MouseEvent<HTMLAnchorElement>) => {
         if (isDev) {
             e.preventDefault();
-            router.push('/projects');
+            router.push('/dashboard');
         }
     };
 
@@ -26,7 +26,7 @@ export default function LiquidDock() {
                 </div>
                 <div className="flex items-center gap-3">
                     <a
-                        href={isDev ? "/projects" : "/login"}
+                        href={isDev ? "/dashboard" : "/login"}
                         onClick={handleLoginClick}
                         className="rounded-full border border-border-ghost px-4 py-2 text-sm font-medium text-text-subtle transition hover:bg-surface"
                     >
@@ -41,7 +41,7 @@ export default function LiquidDock() {
                     <img src="/images/render-vault-logo-v2.png" alt="Render Vault" className="object-contain h-full w-full" />
                 </div>
                 <a
-                    href={isDev ? "/projects" : "/login"}
+                    href={isDev ? "/dashboard" : "/login"}
                     onClick={handleLoginClick}
                     className="rounded-full border border-border-ghost px-3 py-1.5 text-sm font-medium text-text-subtle transition hover:bg-surface"
                 >
