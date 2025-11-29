@@ -8,9 +8,9 @@ export default function ProofWall() {
             after: "/images/homewares-after.png"
         },
         {
-            title: "Furniture",
-            before: "/images/mirror-before.png",
-            after: "/images/mirror-after.png"
+            title: "Beauty",
+            before: "/images/beauty-before.jpg",
+            after: "/images/beauty-after.jpg"
         },
         {
             title: "Apparel",
