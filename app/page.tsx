@@ -8,6 +8,7 @@ import PainContrast from "@/components/PainContrast";
 import FounderSection from "@/components/FounderSection";
 import HowItWorks from "@/components/HowItWorks";
 import Pricing from "@/components/Pricing";
+import Contact from "@/components/Contact";
 import FAQ from "@/components/FAQ";
 import IntakeWizard from "@/components/IntakeWizard";
 
@@ -23,6 +24,7 @@ export default function Home() {
       <PainContrast />
       <HowItWorks onOpenWizard={() => setIsWizardOpen(true)} />
       <Pricing />
+      <Contact />
       <FAQ />
 
       <AnimatePresence>
