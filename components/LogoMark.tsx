@@ -10,7 +10,7 @@ export function LogoMark({ className, priority }: LogoMarkProps) {
   return (
     <span className={clsx('relative inline-flex items-center', className)}>
       <Image
-        src="/logo.svg"
+        src="/render-vault-logo.svg"
         alt="Render Vault"
         width={240}
         height={40}
@@ -20,4 +20,3 @@ export function LogoMark({ className, priority }: LogoMarkProps) {
     </span>
   );
 }
-
