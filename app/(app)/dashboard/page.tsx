@@ -15,6 +15,7 @@ import { formatDate, formatRelativeTime } from '../../../lib/date';
 import type { ProjectType } from '../../../lib/project-types';
 import type { ProjectStatus } from '../../../lib/status';
 import type { ProjectRecord } from '../../../lib/backend-types';
+import { MobileDashboard, HomeScreen } from '../../../components/app/MobileDashboard';
 
 type FilterKey = 'all' | 'active' | 'draft' | 'completed';
 
@@ -364,21 +365,33 @@ export default function DashboardPage() {
   };
 
   return (
-    <div className="space-y-6">
-      <DashboardMobileHome
-        activeCount={stats.active}
-        onOpenProjects={() => {
-          setShowFullMobileDashboard(true);
-          projectsSectionRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
-        }}
-        onNewProject={() => setSheetOpen(true)}
-        onAccount={() => router.push('/profile')}
-        onContact={() => {
-          window.location.href = 'mailto:hello@rendervault.studio';
-        }}
-      />
+    <>
+      {/* Mobile View */}
+      <div className="md:hidden">
+        <MobileDashboard>
+          <HomeScreen
+            activeCount={stats.active}
+            onNewProject={() => setSheetOpen(true)}
+          />
+        </MobileDashboard>
+      </div>
 
-      <section className={clsx('grid gap-4', showFullMobileDashboard ? undefined : 'hidden md:grid')}>
+      {/* Desktop View */}
+      <div className="hidden md:block space-y-6">
+        <DashboardMobileHome
+          activeCount={stats.active}
+          onOpenProjects={() => {
+            setShowFullMobileDashboard(true);
+            projectsSectionRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+          }}
+          onNewProject={() => setSheetOpen(true)}
+          onAccount={() => router.push('/profile')}
+          onContact={() => {
+            window.location.href = 'mailto:hello@rendervault.studio';
+          }}
+        />
+
+        <section className={clsx('grid gap-4', showFullMobileDashboard ? undefined : 'hidden md:grid')}>
         <div className="overflow-hidden rounded-[28px] bg-gradient-to-br from-[#4b6a8e] via-[#4f78a5] to-[#6bc6b5] text-white shadow-[0_18px_40px_rgba(79,120,165,0.28)]">
           <div className="flex flex-col gap-6 p-6">
             <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
@@ -470,12 +483,14 @@ export default function DashboardPage() {
           ))}
         </div>
       )}
+      </div>
 
+      {/* New Project Sheet - Shared for mobile and desktop */}
       <NewProjectSheet
         open={sheetOpen}
         onClose={() => setSheetOpen(false)}
         onCreate={handleCreateProject}
       />
-    </div>
+    </>
   );
 }

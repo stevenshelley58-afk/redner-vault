@@ -1,7 +1,7 @@
 import { redirect } from 'next/navigation';
 import { cookies } from 'next/headers';
 import { getSessionUser } from '../../../lib/server-auth';
-import { ProfilePage } from '../../../components/profile/ProfilePage';
+import { ProfilePageWrapper } from '../../../components/profile/ProfilePageWrapper';
 
 export default async function ProfileRoutePage() {
   const user = await getSessionUser();
@@ -23,7 +23,7 @@ export default async function ProfileRoutePage() {
   const payload = await res.json();
 
   return (
-    <ProfilePage
+    <ProfilePageWrapper
       initialProfile={payload.profile}
       initialBrand={payload.brand}
       initialBilling={payload.billing}
