@@ -1,13 +1,12 @@
 import { redirect } from 'next/navigation';
 import { cookies } from 'next/headers';
-import { createSupabaseServerClient } from '../../../lib/supabase/server';
+import { getSessionUser } from '../../../lib/server-auth';
 import { ProfilePage } from '../../../components/profile/ProfilePage';
 
 export default async function ProfileRoutePage() {
-  const supabase = await createSupabaseServerClient();
-  const { data } = await supabase.auth.getSession();
+  const user = await getSessionUser();
 
-  if (!data?.session) {
+  if (!user) {
     redirect('/login');
   }
 

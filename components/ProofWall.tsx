@@ -3,9 +3,9 @@ import TactileReveal from "./TactileReveal";
 export default function ProofWall() {
     const examples = [
         {
-            title: "Homewares",
-            before: "/images/homewares-before.png",
-            after: "/images/homewares-after.png"
+            title: "Furniture",
+            before: "/images/mirror-before.png",
+            after: "/images/mirror-after.png"
         },
         {
             title: "Beauty",
