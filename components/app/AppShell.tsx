@@ -7,6 +7,7 @@ import { LayoutDashboard, LifeBuoy, Plus, Sparkles, UserRound } from 'lucide-rea
 import clsx from 'clsx';
 import { Button } from '../ui/Button';
 import { AvatarCircle } from './AvatarCircle';
+import { LogoMark } from '../LogoMark';
 
 interface AppShellProps {
   children: ReactNode;
@@ -42,9 +43,7 @@ export function AppShell({ children }: AppShellProps) {
       <aside className="relative hidden w-[250px] shrink-0 border-r border-white/70 bg-white/95 px-4 py-6 shadow-[0_18px_40px_rgba(112,144,176,0.12)] lg:block">
         <div className="sticky top-6 flex h-[calc(100vh-48px)] flex-col rounded-[22px] bg-white/95 p-4 shadow-[0_18px_40px_rgba(112,144,176,0.16)] ring-1 ring-white/80">
           <Link href="/dashboard" className="flex items-center gap-3 rounded-2xl px-2 py-2 hover:bg-[#f5f7fb]">
-            <div className="flex h-10 w-10 items-center justify-center rounded-[14px] bg-gradient-to-br from-[#4b6a8e] via-[#4f78a5] to-[#6bc6b5] text-white shadow-[0_10px_28px_rgba(79,120,165,0.28)]">
-              RV
-            </div>
+            <LogoMark className="h-10" priority />
             <div className="leading-tight">
               <p className="text-sm font-semibold">Render Vault</p>
               <p className="text-xs text-[#7e8aa7]">Creative Ops</p>
@@ -116,9 +115,7 @@ export function AppShell({ children }: AppShellProps) {
           <div className="flex items-center justify-between gap-2">
             <div className="flex items-center gap-2 min-w-0 flex-1">
               <div className="flex items-center gap-2 lg:hidden shrink-0">
-                <div className="flex h-9 w-9 items-center justify-center rounded-[12px] bg-gradient-to-br from-[#4b6a8e] via-[#4f78a5] to-[#6bc6b5] text-white shadow-[0_10px_28px_rgba(79,120,165,0.28)]">
-                  RV
-                </div>
+                <LogoMark className="h-9" priority />
                 <div className="min-w-0">
                   <p className="text-sm font-semibold truncate">Render Vault</p>
                   <p className="text-[10px] text-[#7e8aa7] truncate">Workspace</p>

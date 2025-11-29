@@ -10,6 +10,7 @@ import { Badge } from '../../../components/ui/Badge';
 import { Input } from '../../../components/ui/Input';
 import { StatusPill } from '../../../components/app/StatusPill';
 import { NewProjectForm, type NewProjectFormValues } from '../../../components/app/NewProjectForm';
+import { LogoMark } from '../../../components/LogoMark';
 import { formatDate, formatRelativeTime } from '../../../lib/date';
 import type { ProjectType } from '../../../lib/project-types';
 import type { ProjectStatus } from '../../../lib/status';
@@ -241,9 +242,7 @@ function DashboardMobileHome({
   return (
     <div className="block md:hidden">
       <div className="flex flex-col items-center gap-2 py-6">
-        <div className="flex h-14 w-14 items-center justify-center rounded-[16px] bg-gradient-to-br from-[#4b6a8e] via-[#4f78a5] to-[#6bc6b5] text-white shadow-[0_16px_40px_rgba(0,0,0,0.08)]">
-          RV
-        </div>
+        <LogoMark className="h-14" priority />
         <h1 className="text-2xl font-semibold text-[#1b2559]">Render Vault</h1>
       </div>
       <div className="space-y-3 pb-2">
@@ -480,4 +479,3 @@ export default function DashboardPage() {
     </div>
   );
 }
-

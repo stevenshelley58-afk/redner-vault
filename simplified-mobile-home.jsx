@@ -162,10 +162,10 @@ function HomeScreen({ onNavigate }) {
 
   return (
     <div className="p-6 space-y-5">
-      <div className="text-center space-y-3">
-        <div className="inline-flex items-center justify-center h-16 w-16 rounded-2xl bg-[var(--accent)] text-white text-xl font-bold shadow-md">
-          RV
-        </div>
+        <div className="text-center space-y-3">
+          <div className="inline-flex items-center justify-center h-16 w-16 rounded-2xl bg-[var(--accent)] text-white text-xl font-bold shadow-md">
+            <img src="/logo.svg" alt="Render Vault" className="h-10 w-auto" />
+          </div>
         <div className="space-y-1">
           <h1 className="text-[22px] font-semibold text-[var(--text-ink)] tracking-tight">
             Render Vault
