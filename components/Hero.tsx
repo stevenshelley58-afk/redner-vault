@@ -19,7 +19,7 @@ export default function Hero() {
 
                 {/* Image Content - Right */}
                 <div className="col-span-4 md:col-span-6 order-1 md:order-2">
-                    <div className="aspect-[4/5] w-full bg-surface rounded-sm overflow-hidden relative shadow-2xl">
+                    <div className="aspect-[4/5] w-full bg-surface rounded-2xl overflow-hidden relative shadow-2xl">
                         <TactileReveal
                             // Before: Generated "Bad" photo of t-shirt on rack
                             beforeImage="/images/hero-before-new.jpg"
