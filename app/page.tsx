@@ -9,7 +9,6 @@ import ProofWall from "@/components/ProofWall";
 import FounderSection from "@/components/FounderSection";
 import HowItWorks from "@/components/HowItWorks";
 import Pricing from "@/components/Pricing";
-import UseCases from "@/components/UseCases";
 import FAQ from "@/components/FAQ";
 import IntakeWizard from "@/components/IntakeWizard";
 
@@ -26,7 +25,6 @@ export default function Home() {
       <ProofWall />
       <HowItWorks onOpenWizard={() => setIsWizardOpen(true)} />
       <Pricing />
-      <UseCases />
       <FAQ />
 
       <AnimatePresence>
