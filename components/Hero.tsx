@@ -8,9 +8,7 @@ export default function Hero() {
                 {/* Text Content - Left */}
                 <div className="col-span-4 md:col-span-5 md:col-start-2 flex flex-col justify-center order-2 md:order-1 mt-8 md:mt-0">
                     <h1 className="text-4xl md:text-6xl font-medium tracking-tight text-text-ink leading-[1.1] mb-6">
-                        No models <br />
-                        No venue <br />
-                        No photographer
+                        Digitally generated images for all businesses
                     </h1>
                     <p className="text-lg md:text-xl text-text-subtle leading-relaxed max-w-md">
                         Complete image and content creation
