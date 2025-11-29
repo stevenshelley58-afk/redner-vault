@@ -10,7 +10,7 @@ export default function FAQ() {
     const faqs = [
         {
             question: "How long does it take?",
-            answer: "Standard turnaround is 48 hours for the initial model and first batch. Once the model is in the vault, new renders can be generated instantly."
+            answer: "Standard turnaround is 48 hours after the brief is submitted"
         },
         {
             question: "Do I need to ship my product?",
@@ -18,16 +18,16 @@ export default function FAQ() {
         },
         {
             question: "What if I don't like the renders?",
-            answer: "Unlimited revisions on the 3D model until correct. Satisfaction guarantee on renders."
+            answer: "Unlimited revisions on images until correct. Satisfaction guaranteed or money back."
         },
         {
             question: "Can you do complex animations?",
-            answer: "Yes. Full 3D asset enables anything from 360 spins to physics simulations."
+            answer: "Yes, reach out and we can discuss what you need"
         }
     ];
 
     return (
-        <section className="py-24 px-6 md:px-0 bg-paper">
+        <section id="faq" className="py-24 px-6 md:px-0 bg-paper">
             <div className="max-w-[800px] mx-auto w-full">
                 <h2 className="text-2xl font-medium text-text-ink mb-12 text-center">Common Questions</h2>
 

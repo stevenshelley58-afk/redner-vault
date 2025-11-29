@@ -89,7 +89,7 @@ export default function Contact() {
   };
 
   return (
-    <section className="py-24 px-6 md:px-0 bg-paper">
+    <section id="contact" className="py-24 px-6 md:px-0 bg-paper">
       <div className="max-w-[560px] mx-auto w-full">
         <h2 className="text-4xl font-medium text-text-ink mb-4 text-center tracking-tight">
           Got a project in mind?
