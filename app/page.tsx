@@ -19,8 +19,8 @@ export default function Home() {
       <LiquidDock />
 
       <Hero />
-      <PainContrast />
       <FounderSection />
+      <PainContrast />
       <HowItWorks onOpenWizard={() => setIsWizardOpen(true)} />
       <Pricing />
       <FAQ />
